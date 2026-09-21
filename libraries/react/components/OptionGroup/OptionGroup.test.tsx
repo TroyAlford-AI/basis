@@ -237,7 +237,7 @@ describe('OptionGroup', () => {
     test('renders ToggleEditor components in multiple mode', async () => {
       const onChange = mock()
       const { node } = await render(
-        <OptionGroup<string>
+        <OptionGroup<string, true>
           multiple={true}
           value={['toggle1', 'toggle3']}
           onChange={onChange}
@@ -261,7 +261,7 @@ describe('OptionGroup', () => {
     test('renders mixed Option and ToggleEditor components', async () => {
       const onChange = mock()
       const { node } = await render(
-        <OptionGroup<string>
+        <OptionGroup<string, true>
           multiple={true}
           value={['option1', 'toggle1']}
           onChange={onChange}

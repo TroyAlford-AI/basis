@@ -13,28 +13,35 @@ import { Option } from './Option'
 import './OptionGroup.styles.ts'
 
 /** Props for the OptionGroup component. */
-interface Props extends IAccessible, IFocusable {
+interface Props<T, Multiple extends boolean = false> extends IAccessible, IFocusable {
   /** The children of the component. */
   children?: React.ReactNode,
   /** Whether multiple options can be selected */
-  multiple?: boolean,
+  multiple?: Multiple,
   /** The orientation of the options */
-  orientation?: Orientation,
+  orientation?: Orientation | null,
   /** The current value(s) */
-  value?: unknown | unknown[],
+  value?: T | T[] | null,
 }
+
+/** The value emitted by an option group: `T[]` when multiple, `T | null` otherwise. */
+type OptionGroupValue<T, M extends boolean> = M extends true ? T[] : T | null
 
 /**
  * Option group editor component that extends the Editor base class.
  * Renders either radio buttons (single selection) or checkboxes (multiple selection).
  */
-export class OptionGroup<T, Field extends string = string> extends Editor<
-  T | T[],
-  HTMLFieldSetElement,
-  Props,
-  TState<T | T[]>,
-  Field
-> {
+export class OptionGroup<
+  T,
+  Multiple extends boolean = false,
+  Field extends string = string,
+> extends Editor<
+    OptionGroupValue<T, Multiple>,
+    HTMLFieldSetElement,
+    Props<T, Multiple>,
+    TState<OptionGroupValue<T, Multiple>>,
+    Field
+  > {
   static displayName = 'OptionGroup'
   static Option = Option
 
@@ -50,7 +57,7 @@ export class OptionGroup<T, Field extends string = string> extends Editor<
   }
 
   private get set(): Set<T> {
-    const value = this.current
+    const value = this.current as T | T[] | null
     if (Array.isArray(value)) {
       return new Set(value)
     }
@@ -73,14 +80,16 @@ export class OptionGroup<T, Field extends string = string> extends Editor<
       } else {
         update.delete(data)
       }
-      this.handleChange(Array.from(update))
+      this.handleChange(Array.from(update) as OptionGroupValue<T, Multiple>)
     } else {
       update.clear()
       if (selected) {
         update.add(data)
       }
       // Convert Set back to single value for onChange
-      this.handleChange((update.size > 0 ? Array.from(update)[0] : null) as T | T[])
+      this.handleChange(
+        (update.size > 0 ? Array.from(update)[0] : null) as OptionGroupValue<T, Multiple>,
+      )
     }
   }
 
@@ -181,7 +190,7 @@ export class OptionGroup<T, Field extends string = string> extends Editor<
   override get tag(): 'fieldset' { return 'fieldset' }
 
   override get attributes() {
-    const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy } = this.props as Props & {
+    const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy } = this.props as Props<T, Multiple> & {
       'aria-label'?: string,
       'aria-labelledby'?: string,
     }

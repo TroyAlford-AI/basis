@@ -12,24 +12,30 @@ import { Editor } from '../Editor/Editor'
 import './CheckboxEditor.styles.ts'
 
 /** Props specific to checkbox editor. */
-interface Props extends IAccessible, IFocusable {
+interface Props<AllowIndeterminate extends boolean = false> extends IAccessible, IFocusable {
   /** Whether to allow indeterminate state. Defaults to `false`. */
-  allowIndeterminate?: boolean,
+  allowIndeterminate?: AllowIndeterminate,
   /** The children of the component. */
   children?: React.ReactNode,
 }
+
+/** The value emitted by a checkbox editor: `boolean | null` only when indeterminate is allowed. */
+type CheckboxValue<A extends boolean> = A extends true ? boolean | null : boolean
 
 /**
  * Checkbox editor component that extends the Editor base class.
  * Uses a hidden checkbox with custom square icons for display.
  */
-export class CheckboxEditor<Field extends string = string> extends Editor<
-  boolean | null,
-  HTMLLabelElement,
-  Props,
-  TState<boolean | null>,
-  Field
-> {
+export class CheckboxEditor<
+  AllowIndeterminate extends boolean = false,
+  Field extends string = string,
+> extends Editor<
+    CheckboxValue<AllowIndeterminate>,
+    HTMLLabelElement,
+    Props<AllowIndeterminate>,
+    TState<CheckboxValue<AllowIndeterminate>>,
+    Field
+  > {
   static displayName = 'CheckboxEditor'
   static get defaultProps() {
     return {
@@ -47,20 +53,20 @@ export class CheckboxEditor<Field extends string = string> extends Editor<
 
   #handleChange = () => {
     const { allowIndeterminate } = this.props
-    const currentValue = this.current
+    const currentValue = this.current as boolean | null
 
     if (!allowIndeterminate) {
       // Simple true/false toggle
-      this.handleChange(!currentValue)
+      this.handleChange(!currentValue as CheckboxValue<AllowIndeterminate>)
     } else {
       // Three-state cycle: true -> false -> null -> true
       if (currentValue === true) {
-        this.handleChange(false)
+        this.handleChange(false as CheckboxValue<AllowIndeterminate>)
       } else if (currentValue === false) {
-        this.handleChange(null)
+        this.handleChange(null as CheckboxValue<AllowIndeterminate>)
       } else {
         // currentValue === null
-        this.handleChange(true)
+        this.handleChange(true as CheckboxValue<AllowIndeterminate>)
       }
     }
   }
@@ -127,7 +133,10 @@ export class CheckboxEditor<Field extends string = string> extends Editor<
     this.updateCheckboxIndeterminate()
   }
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<TState<boolean | null>>): void {
+  componentDidUpdate(
+    prevProps: Readonly<Props<AllowIndeterminate>>,
+    prevState: Readonly<TState<CheckboxValue<AllowIndeterminate>>>,
+  ): void {
     super.componentDidUpdate(prevProps, prevState)
     this.updateCheckboxIndeterminate()
   }

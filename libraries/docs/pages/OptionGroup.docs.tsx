@@ -6,10 +6,10 @@ import { Documentation } from '../components/Documentation'
 
 interface State {
   customOptions: string,
-  optionType: 'option' | 'toggle' | ('option' | 'toggle')[],
-  orientation: Orientation | Orientation[],
+  optionType: 'option' | 'toggle' | null,
+  orientation: Orientation | null,
   readOnly: boolean,
-  selectedValue: string | string[],
+  selectedValue: string | null,
 }
 
 export class OptionGroupDocs extends Documentation<State> {
@@ -146,7 +146,7 @@ export class OptionGroupDocs extends Documentation<State> {
               <OptionGroup
                 field="selectedValue"
                 multiple={false}
-                orientation={orientation as Orientation}
+                orientation={orientation}
                 readOnly={readOnly}
                 value={selectedValue}
                 onChange={this.handleField}

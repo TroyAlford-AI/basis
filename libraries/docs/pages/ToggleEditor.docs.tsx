@@ -119,14 +119,11 @@ export class ToggleEditorDocs extends Documentation<State> {
               <h3>With Custom Icons</h3>
               <ToggleEditor
                 aria-label="Toggle with icons"
+                field="toggleValue"
                 off={<Padlock.Unlocked filled />}
                 on={<Padlock.Locked filled />}
                 value={toggleValue}
-                /*
-                 * This demo intentionally omits `field`; the handler receives an empty
-                 * field and no-ops, so the precise path type cannot describe it.
-                 */
-                onChange={this.handleField as (value: boolean, field: string, editor: unknown) => void}
+                onChange={this.handleField}
               />
             </div>
           </div>

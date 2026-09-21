@@ -30,7 +30,7 @@ export function hash(value: unknown, options?: Partial<Options>): string
 
 export function hash(value: unknown, options: Partial<Options> = {}): string | null {
   const { characters, length, padWith, prefix }: Options = { ...DEFAULTS, ...options }
-  if (value === null || value === undefined) return null
+  if (([null, undefined] as unknown[]).includes(value)) return null
 
   const json = JSON.stringify(value)
   let number = 0

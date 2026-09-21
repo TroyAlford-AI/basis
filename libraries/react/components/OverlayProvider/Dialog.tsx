@@ -254,11 +254,8 @@ export class Dialog extends Component<Props<unknown>, HTMLDialogElement> {
     this.#syncModalOpenState()
   }
 
-  componentDidUpdate(
-    ...args: Parameters<Component<Props<unknown>, HTMLDialogElement>['componentDidUpdate']>
-  ): void {
-    super.componentDidUpdate(...args)
-    const [prevProps] = args
+  componentDidUpdate(prevProps: Readonly<Props<unknown>>, prevState: Readonly<object>): void {
+    super.componentDidUpdate(prevProps, prevState)
     if (prevProps.id !== this.props.id) this.#syncModalOpenState()
   }
 
@@ -276,7 +273,7 @@ export class Dialog extends Component<Props<unknown>, HTMLDialogElement> {
       <Tag
         ref={this.#bindDialogRef}
         {...this.attributes}
-        className={classNames(className ?? '', this.classNames)}
+        className={classNames(className as string, this.classNames)}
       >
         {this.content()}
       </Tag>

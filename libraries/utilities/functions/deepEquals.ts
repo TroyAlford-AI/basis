@@ -8,9 +8,7 @@ export function deepEquals<T>(one: T, two: T): boolean {
   const queue: [unknown, unknown][] = [[one, two]]
 
   while (queue.length) {
-    const next = queue.shift()
-    if (!next) continue
-    const [a, b] = next
+    const [a, b] = queue.shift() as [unknown, unknown]
 
     // Check for strict equality first
     if (a === b) continue

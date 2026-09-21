@@ -66,7 +66,7 @@ export class Builder {
       // Only rebuild for TypeScript/JavaScript files
       if (!/\.(tsx?|jsx?)$/.test(changedPath)) return
 
-      if (rebuildTimeout) clearTimeout(rebuildTimeout)
+      clearTimeout(rebuildTimeout as Timer)
 
       rebuildTimeout = setTimeout(async () => {
         console.log(`[HMR] File changed: ${changedPath}`)

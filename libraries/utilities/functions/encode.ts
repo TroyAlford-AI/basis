@@ -13,7 +13,7 @@ export function encode(value: null | undefined): null
 export function encode<V>(value: V): `H-${string}`
 
 export function encode<V = unknown>(value: V): `H-${string}` | null {
-  if (value === null || value === undefined) return null
+  if (([null, undefined] as unknown[]).includes(value)) return null
 
   const jsonString = JSON.stringify(value)
   const base64 = Buffer.from(jsonString)

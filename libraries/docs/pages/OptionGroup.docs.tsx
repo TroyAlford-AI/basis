@@ -146,7 +146,7 @@ export class OptionGroupDocs extends Documentation<State> {
               <OptionGroup
                 field="selectedValue"
                 multiple={false}
-                orientation={Array.isArray(orientation) ? orientation[0] : orientation}
+                orientation={orientation as Orientation}
                 readOnly={readOnly}
                 value={selectedValue}
                 onChange={this.handleField}

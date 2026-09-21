@@ -98,8 +98,8 @@ export class OptionGroup<T, Field extends string = string> extends Editor<
 
   #handleKeyDown = (event: React.KeyboardEvent<HTMLFieldSetElement>): void => {
     // Handle the onKeyDown prop manually (like the base class does)
-    const { onKeyDown } = this.props
-    onKeyDown?.(event)
+    const { onKeyDown } = this.props;
+    (onKeyDown as (event: React.KeyboardEvent<HTMLElement>) => void)(event)
 
     /*
      * CRITICAL: Use event.currentTarget (the fieldset) instead of this.rootNode

@@ -104,11 +104,9 @@ export class NumberEditor<Field extends string = string> extends Editor<
 
   static getCursorPosition(input: HTMLInputElement): { prefix: string, selected: string, suffix: string } {
     const value = input.value
-    const selectionStart = input.selectionStart ?? 0
-    const selectionEnd = input.selectionEnd ?? 0
-    const prefix = value.slice(0, selectionStart)
-    const selected = value.slice(selectionStart, selectionEnd)
-    const suffix = value.slice(selectionEnd)
+    const prefix = value.slice(0, input.selectionStart as number)
+    const selected = value.slice(input.selectionStart as number, input.selectionEnd as number)
+    const suffix = value.slice(input.selectionEnd as number)
 
     return {
       prefix: NumberEditor.sanitize(prefix),
@@ -123,8 +121,8 @@ export class NumberEditor<Field extends string = string> extends Editor<
   }
 
   protected handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const { max, min, step = 1 } = this.props
-    this.props.onKeyDown?.(event)
+    const { max, min, step = 1 } = this.props;
+    (this.props.onKeyDown as (event: React.KeyboardEvent<HTMLElement>) => void)(event)
     if (event.defaultPrevented) return
 
     if ([Keyboard.ArrowUp, Keyboard.ArrowDown].includes(event.key as Keyboard)) {

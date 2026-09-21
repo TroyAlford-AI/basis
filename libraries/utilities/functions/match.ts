@@ -157,9 +157,7 @@ class Match<Value, Return = unknown, Narrowed = unknown> {
     const queue: [unknown, unknown][] = [[matcher, this.value]]
 
     while (queue.length) {
-      const next = queue.shift()
-      if (!next) continue
-      const [matchOn, value] = next
+      const [matchOn, value] = queue.shift() as [unknown, unknown]
 
       if (matchOn === value) continue
 

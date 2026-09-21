@@ -123,7 +123,7 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
   }
 
   private handleClose = (): void => {
-    this.setState({ open: false }, () => this.props.onClose?.())
+    this.setState({ open: false }, () => (this.props.onClose as () => void)())
   }
 
   private handleInputChange = async (search: string): Promise<void> => {
@@ -140,8 +140,8 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
 
           // Only update if this is still the most recent search
           if (this.searchCounter === searchId) {
-            await this.setState({ loading: false, open: true, options })
-            this.props.onOpen?.()
+            await this.setState({ loading: false, open: true, options });
+            (this.props.onOpen as () => void)()
           }
         } catch (error) {
           // Only update if this is still the most recent search
@@ -162,11 +162,11 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
   private handleFocus = (): void => {
     // Open dropdown if we have a search query (to show "No results" or existing results)
     if (this.state.search.length >= (this.props.minimumQueryLength ?? 0)) {
-      this.setState({ open: true }, () => this.props.onOpen?.())
+      this.setState({ open: true }, () => (this.props.onOpen as () => void)())
     }
   }
 
-  protected handleTextEditorKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
+  protected handleTextEditorKeyDown = (event: React.KeyboardEvent<HTMLElement>): boolean | undefined => {
     if (event.defaultPrevented) return
 
     match(event.key)

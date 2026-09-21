@@ -122,7 +122,11 @@ export class ToggleEditorDocs extends Documentation<State> {
                 off={<Padlock.Unlocked filled />}
                 on={<Padlock.Locked filled />}
                 value={toggleValue}
-                onChange={this.handleField}
+                /*
+                 * This demo intentionally omits `field`; the handler receives an empty
+                 * field and no-ops, so the precise path type cannot describe it.
+                 */
+                onChange={this.handleField as (value: boolean, field: string, editor: unknown) => void}
               />
             </div>
           </div>

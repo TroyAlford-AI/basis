@@ -75,7 +75,7 @@ export class Table<T extends object = { id: string }>
           const { field } = definition
 
           definitions.set(field, definition)
-          if (!prevState.states.has(field)) {
+          if (!prevState.states?.has(field)) {
             prevState.states.set(field, { ...definition })
           }
         })

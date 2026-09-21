@@ -99,7 +99,7 @@ export class DropdownMenu extends Component<Props, HTMLDivElement, State> {
 
   private handleClose = (): void => {
     if (!this.isOpen) return
-    this.setState({ open: false }, () => this.props.onClose?.())
+    this.setState({ open: false }, () => (this.props.onClose as () => void)())
   }
 
   protected handleKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
@@ -113,10 +113,10 @@ export class DropdownMenu extends Component<Props, HTMLDivElement, State> {
 
     this.setState(prevState => ({ open: !prevState.open }), () => {
       if (this.state.open) {
-        this.props.onOpen?.()
+        (this.props.onOpen as () => void)()
         this.menuItems[0]?.focus()
       } else {
-        this.props.onClose?.()
+        (this.props.onClose as () => void)()
       }
     })
   }

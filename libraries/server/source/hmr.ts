@@ -12,7 +12,8 @@ if (typeof window !== 'undefined') {
         // Clear module cache and reload once
         const moduleCache = Object.keys(window)
           .filter(k => k.startsWith('__bun_'))
-        moduleCache.forEach(key => Reflect.deleteProperty(window, key))
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        moduleCache.forEach(key => delete (window as unknown as Record<string, unknown>)[key])
         window.location.reload()
       }
     }

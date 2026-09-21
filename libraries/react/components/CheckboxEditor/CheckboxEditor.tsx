@@ -127,12 +127,8 @@ export class CheckboxEditor<Field extends string = string> extends Editor<
     this.updateCheckboxIndeterminate()
   }
 
-  componentDidUpdate(
-    ...args: Parameters<
-      Editor<boolean | null, HTMLLabelElement, Props, TState<boolean | null>, Field>['componentDidUpdate']
-    >
-  ): void {
-    super.componentDidUpdate(...args)
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<TState<boolean | null>>): void {
+    super.componentDidUpdate(prevProps, prevState)
     this.updateCheckboxIndeterminate()
   }
 

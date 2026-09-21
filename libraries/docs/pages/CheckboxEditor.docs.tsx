@@ -66,8 +66,8 @@ export class CheckboxEditorDocs extends Documentation<State> {
             }}
             >
               <CheckboxEditor
-                allowIndeterminate={this.current.allowIndeterminate ?? false}
-                disabled={this.current.disabled ?? false}
+                allowIndeterminate={this.current.allowIndeterminate as boolean}
+                disabled={this.current.disabled as boolean}
                 field="checked"
                 value={this.current.checked}
                 onChange={this.handleField}

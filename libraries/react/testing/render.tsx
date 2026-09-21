@@ -159,7 +159,7 @@ export async function render<
 >(children: React.ReactElement, target?: HTMLElement, root?: ReactDOM.Root): Promise<Rendered<C, N>> {
   const rootElement = target ?? document.createElement('div')
   const rootDOM = root ?? ReactDOM.createRoot(rootElement)
-  const mounterRef = React.createRef<Mounter<C>>()
+  const mounterRef = React.createRef<Mounter<C>>() as React.MutableRefObject<Mounter<C>>
   const childRef = React.createRef<C>()
 
   // Establish promise/callback for the initial mount
@@ -198,8 +198,7 @@ export async function render<
   await onMountedPromise
 
   // Set the onUpdated callback on the mounter ref
-  const mounter = mounterRef.current as Mounter<C>
-  mounter.onUpdated = onUpdated
+  mounterRef.current.onUpdated = onUpdated
 
   /**
    * Search for a component instance in the rendered tree
@@ -216,9 +215,8 @@ export async function render<
     if (!instance) return null
 
     const fiberKey = Object.keys(instance).find(k => k.startsWith('__reactFiber$'))
-    // React attaches its fiber to the instance under a versioned private key.
-    const fiber = fiberKey ? Reflect.get(instance, fiberKey) as Fiber | undefined : undefined
-    const queue: Fiber[] = fiber ? [fiber] : []
+    const fiber = fiberKey ? (instance as unknown as Record<string, unknown>)[fiberKey] : undefined
+    const queue: Fiber[] = [fiber as Fiber]
 
     while (queue.length) {
       const node = queue.shift()
@@ -243,7 +241,6 @@ export async function render<
       await onMountedPromise
       return Promise.all(Array.from(search<I>(ctor)))
     },
-    // The public type is `C`; function components simply return null at runtime.
     get instance() { return childRef.current as C },
     get node(): N {
       return rootElement.children.length > 1
@@ -269,10 +266,10 @@ export async function render<
         hasUpdated = false
         updatePromise = new Promise<void>(resolve => { onUpdated = resolve })
           .then(() => { hasUpdated = true })
-        mounter.onUpdated = onUpdated
+        mounterRef.current.onUpdated = onUpdated
       }
 
-      mounter.setState({ children: update })
+      mounterRef.current.setState({ children: update })
 
       let finished = false
       updatePromise.then(() => { finished = true })

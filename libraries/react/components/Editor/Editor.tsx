@@ -145,7 +145,7 @@ export abstract class Editor<
    */
   protected handleField = async <Path extends PathOf<Value>>(
     value: TypeAt<Value, Path>,
-    path: Path | (string & {}),
+    path: Path,
   ): Promise<void> => {
     const update = clone(this.current)
 
@@ -153,7 +153,7 @@ export abstract class Editor<
     const lastPart = parts.pop()
     if (!lastPart) return
 
-    set(update, path as Path, value)
+    set(update, path, value)
     await this.handleChange(update)
   }
 

@@ -1,11 +1,9 @@
 import { afterEach, beforeEach, spyOn } from 'bun:test'
 
-const FILTERED_WARNINGS = [
+global.FILTERED_WARNINGS = [
   /ReactDOM.render is no longer supported in React 18/,
   /React will try to recreate this component tree from scratch using the error boundary you provided, Mounter./,
 ]
-
-Object.assign(globalThis, { FILTERED_WARNINGS })
 
 const originalConsole = { ...console }
 
@@ -13,7 +11,7 @@ const logIfNotFiltered = (
   type: 'error' | 'warn' | 'info' | 'log' | 'debug' | 'trace',
   messages: unknown[],
 ) => {
-  if (FILTERED_WARNINGS.some(regex => regex.test(messages.map(String).join('')))) return
+  if (global.FILTERED_WARNINGS.some(regex => regex.test(messages.map(String).join('')))) return
   originalConsole[type](messages)
 }
 

@@ -170,7 +170,7 @@ export abstract class Component<
       <Tag // @ts-expect-error - we are assuming a props match
         ref={nodeRef ?? this.nodeRef}
         {...this.attributes}
-        className={classNames(className ?? '', this.classNames)}
+        className={classNames(className as string, this.classNames)}
       >
         {this.content(children)}
       </Tag>
@@ -188,7 +188,7 @@ export abstract class Component<
    * @param event The keyboard event.
    */
   protected handleKeyDown(event: React.KeyboardEvent<HTMLElement>): void {
-    this.props.onKeyDown?.(event)
+    (this.props.onKeyDown as (event: React.KeyboardEvent<HTMLElement>) => void)(event)
   }
 
   /**

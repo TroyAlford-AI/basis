@@ -105,19 +105,17 @@ export class Server {
    * @returns The module response.
    */
   async handleModule(uri: URI): Promise<Response> {
-    let content = this.#modules.get(uri.route)
-
-    if (content === undefined) {
+    if (!this.#modules.has(uri.route)) {
       const response = await fetch(`https://unpkg.com/${uri.route}`)
       if (!response.ok) return Server.NotFound
 
-      content = await response.text()
-      this.#modules.set(uri.route, content)
+      const text = await response.text()
+      this.#modules.set(uri.route, text)
     }
 
-    return new Response(content, {
+    return new Response(this.#modules.get(uri.route) as string, {
       headers: {
-        'Content-Length': content.length.toString(),
+        'Content-Length': (this.#modules.get(uri.route) as string).length.toString(),
         'Content-Type': 'application/javascript',
         'Via': '@basis/server; proxying unpkg.com',
       },

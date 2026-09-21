@@ -25,7 +25,7 @@ interface State {
 }
 
 /** TagsEditor component that allows adding and removing tags. */
-export class TagsEditor extends Editor<string[], HTMLDivElement, Props, State> {
+export class TagsEditor<Field extends string = string> extends Editor<string[], HTMLDivElement, Props, State, Field> {
   static displayName = 'TagsEditor'
 
   /** Default props for tags editor. */
@@ -138,7 +138,7 @@ export class TagsEditor extends Editor<string[], HTMLDivElement, Props, State> {
     const tag = event.currentTarget
       .closest<HTMLDivElement>('.tag.component')
       ?.dataset.value
-    this.handleRemove(tag)
+    this.handleRemove(tag as string)
   }
 
   get attributes() {

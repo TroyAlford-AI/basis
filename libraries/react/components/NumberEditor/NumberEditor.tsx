@@ -10,6 +10,7 @@ import type { IPrefixSuffix } from '../../mixins/PrefixSuffix'
 import { PrefixSuffix } from '../../mixins/PrefixSuffix'
 import { Keyboard } from '../../types/Keyboard'
 import type { Mixin } from '../../types/Mixin'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
 
 import './NumberEditor.styles.ts'
@@ -27,7 +28,13 @@ interface Props extends IAccessible, IPrefixSuffix, IPlaceholder, IFocusable {
 /**
  * Simple number input editor component that extends the Editor base class.
  */
-export class NumberEditor extends Editor<number, HTMLInputElement, Props> {
+export class NumberEditor<Field extends string = string> extends Editor<
+  number,
+  HTMLInputElement,
+  Props,
+  TState<number>,
+  Field
+> {
   static displayName = 'NumberEditor'
 
   static get defaultProps() {
@@ -97,9 +104,11 @@ export class NumberEditor extends Editor<number, HTMLInputElement, Props> {
 
   static getCursorPosition(input: HTMLInputElement): { prefix: string, selected: string, suffix: string } {
     const value = input.value
-    const prefix = value.slice(0, input.selectionStart)
-    const selected = value.slice(input.selectionStart, input.selectionEnd)
-    const suffix = value.slice(input.selectionEnd)
+    const selectionStart = input.selectionStart ?? 0
+    const selectionEnd = input.selectionEnd ?? 0
+    const prefix = value.slice(0, selectionStart)
+    const selected = value.slice(selectionStart, selectionEnd)
+    const suffix = value.slice(selectionEnd)
 
     return {
       prefix: NumberEditor.sanitize(prefix),
@@ -115,7 +124,7 @@ export class NumberEditor extends Editor<number, HTMLInputElement, Props> {
 
   protected handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const { max, min, step = 1 } = this.props
-    this.props.onKeyDown(event)
+    this.props.onKeyDown?.(event)
     if (event.defaultPrevented) return
 
     if ([Keyboard.ArrowUp, Keyboard.ArrowDown].includes(event.key as Keyboard)) {

@@ -162,7 +162,7 @@ export class Dialog extends Component<Props<unknown>, HTMLDialogElement> {
         {createElement(EditorComponent as unknown as ComponentClass<Record<string, unknown>>, {
           ...editorProps,
           initialValue,
-          onChange: (next, field, editor) => {
+          onChange: (next: Value, field: string, editor: unknown) => {
             value = next
             onChange?.(next, field, editor)
           },
@@ -254,8 +254,11 @@ export class Dialog extends Component<Props<unknown>, HTMLDialogElement> {
     this.#syncModalOpenState()
   }
 
-  componentDidUpdate(prevProps: Readonly<Props<unknown>>, prevState: Readonly<object>): void {
-    super.componentDidUpdate(prevProps, prevState)
+  componentDidUpdate(
+    ...args: Parameters<Component<Props<unknown>, HTMLDialogElement>['componentDidUpdate']>
+  ): void {
+    super.componentDidUpdate(...args)
+    const [prevProps] = args
     if (prevProps.id !== this.props.id) this.#syncModalOpenState()
   }
 
@@ -273,7 +276,7 @@ export class Dialog extends Component<Props<unknown>, HTMLDialogElement> {
       <Tag
         ref={this.#bindDialogRef}
         {...this.attributes}
-        className={classNames(className, this.classNames)}
+        className={classNames(className ?? '', this.classNames)}
       >
         {this.content()}
       </Tag>

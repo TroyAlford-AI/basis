@@ -12,7 +12,7 @@ type Data = Record<string, Value | (() => Value)>
 export const dataAttributes = (data: Data = {}): DataAttributes => (
   Object.entries(data).reduce(
     (attributes, [key, value]) => {
-      const attribute = key.replace(/^(?:data-?)?(.*)$/, (_, $1) => `data-${kebabCase($1)}`)
+      const attribute = key.replace(/^(?:data-?)?(.*)$/, (_, $1) => `data-${kebabCase($1)}`) as `data-${string}`
       attributes[attribute] = value instanceof Function ? value() : value
 
       return attributes

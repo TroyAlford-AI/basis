@@ -21,7 +21,7 @@ interface Props<T> {
 interface State<T> {
   definitions?: Map<PathOf<T>, ColumnProps<T, PathOf<T>>>,
   prevChildren?: React.ReactNode,
-  states?: Map<PathOf<T>, Partial<ColumnProps<T, PathOf<T>>>>,
+  states: Map<PathOf<T>, Partial<ColumnProps<T, PathOf<T>>>>,
 }
 
 export class Table<T extends object = { id: string }>
@@ -51,7 +51,10 @@ export class Table<T extends object = { id: string }>
     }
   }
 
-  static getDerivedStateFromProps<T extends object>(nextProps: Props<T>, prevState: State<T>): State<T> {
+  static getDerivedStateFromProps<T extends object>(
+    nextProps: Props<T>,
+    prevState: State<T>,
+  ): Partial<State<T>> | null {
     // Recompute definitions if children changed
     if (nextProps.children !== prevState.prevChildren) {
       const definitions = new Map<PathOf<T>, ColumnProps<T, PathOf<T>>>()
@@ -72,7 +75,7 @@ export class Table<T extends object = { id: string }>
           const { field } = definition
 
           definitions.set(field, definition)
-          if (!prevState.states?.has(field)) {
+          if (!prevState.states.has(field)) {
             prevState.states.set(field, { ...definition })
           }
         })
@@ -87,14 +90,14 @@ export class Table<T extends object = { id: string }>
   }
 
   private rowId = (row: T, index: number): string | number => {
-    const keyField = this.props.keyField
+    const keyField = this.props.keyField as PathOf<T>
     return (get(row, keyField) || index) as string | number
   }
 
   private handleColumnChange = (change: ColumnProps<T, PathOf<T>>) => {
     const { states } = this.state
     const field = change.field
-    const state = states.get(field)
+    const state = states.get(field) as Partial<ColumnProps<T, PathOf<T>>>
 
     // If sort direction changed, clear other columns' sort directions
     if (state.sortDirection !== change.sortDirection) {

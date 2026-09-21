@@ -15,7 +15,7 @@ describe('pluginSASS', () => {
 
     expect(build.outputs).toHaveLength(1)
     expect(build.outputs.map(file => file.path)).toMatchSnapshot()
-    const js = build.outputs.find(file => file.path === JS_FILEPATH)
+    const js = build.outputs.find(file => file.path === JS_FILEPATH) as (typeof build.outputs)[number]
     expect(await js.text()).toMatchSnapshot()
   })
 })

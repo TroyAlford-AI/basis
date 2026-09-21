@@ -6,6 +6,7 @@ import { Accessible } from '../../mixins/Accessible'
 import type { IFocusable } from '../../mixins/Focusable'
 import { Focusable } from '../../mixins/Focusable'
 import type { Mixin } from '../../types/Mixin'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
 
 import './CheckboxEditor.styles.ts'
@@ -22,7 +23,13 @@ interface Props extends IAccessible, IFocusable {
  * Checkbox editor component that extends the Editor base class.
  * Uses a hidden checkbox with custom square icons for display.
  */
-export class CheckboxEditor extends Editor<boolean | null, HTMLLabelElement, Props> {
+export class CheckboxEditor<Field extends string = string> extends Editor<
+  boolean | null,
+  HTMLLabelElement,
+  Props,
+  TState<boolean | null>,
+  Field
+> {
   static displayName = 'CheckboxEditor'
   static get defaultProps() {
     return {
@@ -120,8 +127,12 @@ export class CheckboxEditor extends Editor<boolean | null, HTMLLabelElement, Pro
     this.updateCheckboxIndeterminate()
   }
 
-  componentDidUpdate(prevProps, prevState): void {
-    super.componentDidUpdate(prevProps, prevState)
+  componentDidUpdate(
+    ...args: Parameters<
+      Editor<boolean | null, HTMLLabelElement, Props, TState<boolean | null>, Field>['componentDidUpdate']
+    >
+  ): void {
+    super.componentDidUpdate(...args)
     this.updateCheckboxIndeterminate()
   }
 

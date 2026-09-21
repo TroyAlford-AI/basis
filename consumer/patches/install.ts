@@ -165,7 +165,7 @@ const gitApply = (packageDir: string, args: string[], patchPath: string): GitApp
     stdout: 'pipe',
   })
 
-  return { code: result.exitCode, stderr: result.stderr.toString() }
+  return { code: result.exitCode, stderr: result.stderr?.toString() ?? '' }
 }
 
 /**

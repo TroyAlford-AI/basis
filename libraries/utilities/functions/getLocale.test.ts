@@ -30,7 +30,8 @@ test('getLocale', () => {
     expect(getLocale()).toBe('en-US')
 
     // Test undefined navigator (server-side)
-    global.navigator = undefined
+    const globalWithNavigator = global as unknown as { navigator: Navigator | undefined }
+    globalWithNavigator.navigator = undefined
     expect(getLocale()).toBe('en-US')
   } finally {
     global.navigator = originalNavigator

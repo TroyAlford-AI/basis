@@ -4,7 +4,7 @@ import type { Component } from '../components/Component/Component'
 /** Type for mixin objects. */
 export interface Mixin<Props = unknown> {
   /** Attributes to apply to the component. */
-  attributes?: (props: Props) => Record<string, boolean | string>,
+  attributes?(props: Props): Record<string, boolean | string | undefined>,
   /** Called after component mounts. */
   componentDidMount?<E extends HTMLElement | SVGElement, S>(
     component: Component<Props, E, S>,

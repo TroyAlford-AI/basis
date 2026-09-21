@@ -89,7 +89,7 @@ export class DropdownMenu extends Component<Props, HTMLDivElement, State> {
 
   componentDidMount(): void {
     super.componentDidMount()
-    this.unsubscribeBlur = events.on(Event.Blur, this.rootNode, this.handleClose)
+    this.unsubscribeBlur = events.on(Event.Blur, this.rootNode as Element, this.handleClose)
   }
 
   componentWillUnmount(): void {
@@ -99,7 +99,7 @@ export class DropdownMenu extends Component<Props, HTMLDivElement, State> {
 
   private handleClose = (): void => {
     if (!this.isOpen) return
-    this.setState({ open: false }, () => this.props.onClose())
+    this.setState({ open: false }, () => this.props.onClose?.())
   }
 
   protected handleKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
@@ -113,10 +113,10 @@ export class DropdownMenu extends Component<Props, HTMLDivElement, State> {
 
     this.setState(prevState => ({ open: !prevState.open }), () => {
       if (this.state.open) {
-        this.props.onOpen()
+        this.props.onOpen?.()
         this.menuItems[0]?.focus()
       } else {
-        this.props.onClose()
+        this.props.onClose?.()
       }
     })
   }
@@ -128,12 +128,15 @@ export class DropdownMenu extends Component<Props, HTMLDivElement, State> {
       if (React.isValidElement(child) && child.type === DropdownMenuItem) {
         const { closeOnActivate = true, onActivate = noop } = child.props as DropdownMenuItem['props']
 
-        return React.cloneElement<DropdownMenuItem<typeof child.props>['props']>(child, {
-          onActivate: (event: React.MouseEvent, menuItem) => {
-            onActivate(event, menuItem)
-            if (closeOnActivate) this.handleClose()
+        return React.cloneElement<DropdownMenuItem<typeof child.props>['props']>(
+          child as React.ReactElement<DropdownMenuItem<typeof child.props>['props']>,
+          {
+            onActivate: (event: React.SyntheticEvent, menuItem) => {
+              onActivate(event, menuItem)
+              if (closeOnActivate) this.handleClose()
+            },
           },
-        })
+        )
       }
 
       return child

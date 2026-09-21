@@ -113,7 +113,7 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
 
   override componentDidMount(): void {
     super.componentDidMount()
-    this.unsubscribeBlur = events.on(Event.Blur, this.rootNode, this.handleClose)
+    this.unsubscribeBlur = events.on(Event.Blur, this.rootNode as Element, this.handleClose)
   }
 
   override componentWillUnmount(): void {
@@ -123,7 +123,7 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
   }
 
   private handleClose = (): void => {
-    this.setState({ open: false }, () => this.props.onClose())
+    this.setState({ open: false }, () => this.props.onClose?.())
   }
 
   private handleInputChange = async (search: string): Promise<void> => {
@@ -141,7 +141,7 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
           // Only update if this is still the most recent search
           if (this.searchCounter === searchId) {
             await this.setState({ loading: false, open: true, options })
-            this.props.onOpen()
+            this.props.onOpen?.()
           }
         } catch (error) {
           // Only update if this is still the most recent search
@@ -162,11 +162,11 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
   private handleFocus = (): void => {
     // Open dropdown if we have a search query (to show "No results" or existing results)
     if (this.state.search.length >= (this.props.minimumQueryLength ?? 0)) {
-      this.setState({ open: true }, () => this.props.onOpen())
+      this.setState({ open: true }, () => this.props.onOpen?.())
     }
   }
 
-  protected handleTextEditorKeyDown = (event: React.KeyboardEvent<HTMLElement>): boolean => {
+  protected handleTextEditorKeyDown = (event: React.KeyboardEvent<HTMLElement>): void => {
     if (event.defaultPrevented) return
 
     match(event.key)
@@ -196,7 +196,7 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
   )
 
   get menuItems(): HTMLLIElement[] {
-    const menuItems = this.rootNode.querySelectorAll<HTMLLIElement>('.menu-item.component')
+    const menuItems = (this.rootNode as Element).querySelectorAll<HTMLLIElement>('.menu-item.component')
     return Array.from<HTMLLIElement>(menuItems) ?? []
   }
 
@@ -291,7 +291,7 @@ export class AutoComplete<T = unknown> extends Component<Props<T>, HTMLDivElemen
         {this.isOpen && (
           <PopupMenu
             anchorPoint={this.props.anchorPoint}
-            anchorTo={this.input.current?.rootNode}
+            anchorTo={this.input.current?.rootNode as HTMLElement | undefined}
             disabled={this.props.disabled}
             offset={this.props.offset}
             onKeyDown={this.handleMenuKeyDown}

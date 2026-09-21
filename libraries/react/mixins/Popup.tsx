@@ -11,7 +11,7 @@ export interface IPopup {
   /** The anchor point where the popup should be positioned relative to the reference element. */
   anchorPoint?: AnchorPoint,
   /** Optional ref to the element the popup should attach to. If omitted, targets parent element. */
-  anchorTo?: HTMLElement | React.RefObject<HTMLElement>,
+  anchorTo?: HTMLElement | React.RefObject<HTMLElement | null>,
   /** Whether to show an arrow pointing to the reference element. */
   arrow?: boolean,
   /** The offset distance between the popup and reference element. */
@@ -52,8 +52,10 @@ export const Popup: Mixin<IPopup> = {
   componentDidMount<E extends HTMLElement | SVGElement>(
     component: { props: IPopup, rootNode: E | null },
   ): void {
-    component.rootNode.setAttribute('popover', 'manual');
-    (component.rootNode as HTMLElement).showPopover?.()
+    const rootNode = component.rootNode as E
+
+    rootNode.setAttribute('popover', 'manual');
+    (rootNode as HTMLElement).showPopover?.()
     reposition(component)
   },
 

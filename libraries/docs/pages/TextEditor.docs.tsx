@@ -86,7 +86,7 @@ export class TextEditorDocs extends Documentation<State> {
                 <strong>Multiline Mode</strong>
                 <select
                   style={{ padding: '0.5rem', width: '100%' }}
-                  value={this.current.multiline.toString()}
+                  value={(this.current.multiline as NonNullable<State['multiline']>).toString()}
                   onChange={e => {
                     const raw = e.target.value
                     const multiline = raw === 'false'

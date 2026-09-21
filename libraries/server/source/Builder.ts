@@ -25,7 +25,7 @@ interface BuilderOptions {
 /* eslint-disable no-console */
 /* TODO: add a proper logger */
 export class Builder {
-  #build: Promise<BuildOutput[]>
+  #build!: Promise<BuildOutput[]>
   #entrypoints: [string, string][] = []
   #onRebuild: BuilderOptions['onRebuild']
   #root: string
@@ -66,7 +66,7 @@ export class Builder {
       // Only rebuild for TypeScript/JavaScript files
       if (!/\.(tsx?|jsx?)$/.test(changedPath)) return
 
-      clearTimeout(rebuildTimeout)
+      if (rebuildTimeout) clearTimeout(rebuildTimeout)
 
       rebuildTimeout = setTimeout(async () => {
         console.log(`[HMR] File changed: ${changedPath}`)

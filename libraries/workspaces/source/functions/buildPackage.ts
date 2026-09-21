@@ -29,7 +29,7 @@ interface BuildOptions {
    */
   target?: 'browser' | 'bun',
   /** Package version */
-  version: string,
+  version?: string,
 }
 
 /**

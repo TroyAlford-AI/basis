@@ -103,7 +103,7 @@ export class Cell<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
         return super.content(
           <EnumEditor
             readOnly
-            enum={this.props.enum}
+            enum={this.props.enum as Record<string, string | number>}
             field={field}
             value={value as string | number}
             onChange={this.handleChange}

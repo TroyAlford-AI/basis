@@ -6,8 +6,8 @@ interface Options {
   timeout?: number,
 }
 
-export const waitFor = <T>(callback: Callback<T>, options: Options = {}): Promise<T> => (
-  new Promise<T>((resolve, reject) => {
+export const waitFor = <T>(callback: Callback<T>, options: Options = {}): Promise<NonNullable<T>> => (
+  new Promise<NonNullable<T>>((resolve, reject) => {
     const { interval = 20, maxAttempts, timeout = 2_000 } = options
     const expiry: Timer = setTimeout(
       () => reject(new Error('waitFor: timeout reached')),
@@ -36,7 +36,8 @@ export const waitFor = <T>(callback: Callback<T>, options: Options = {}): Promis
         if (result) {
           resolved = true
           clear()
-          return resolve(result)
+          // Only truthy results resolve, so null/undefined are excluded here.
+          return resolve(result as NonNullable<T>)
         } else {
           setTimeout(attempt, interval)
         }

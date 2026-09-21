@@ -6,6 +6,7 @@ import { Focusable } from '../../mixins/Focusable'
 import { Keyboard } from '../../types/Keyboard'
 import type { Mixin } from '../../types/Mixin'
 import type { Orientation } from '../../types/Orientation'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
 import { Option } from './Option'
 
@@ -27,7 +28,13 @@ interface Props extends IAccessible, IFocusable {
  * Option group editor component that extends the Editor base class.
  * Renders either radio buttons (single selection) or checkboxes (multiple selection).
  */
-export class OptionGroup<T> extends Editor<T | T[], HTMLFieldSetElement, Props> {
+export class OptionGroup<T, Field extends string = string> extends Editor<
+  T | T[],
+  HTMLFieldSetElement,
+  Props,
+  TState<T | T[]>,
+  Field
+> {
   static displayName = 'OptionGroup'
   static Option = Option
 
@@ -73,7 +80,7 @@ export class OptionGroup<T> extends Editor<T | T[], HTMLFieldSetElement, Props> 
         update.add(data)
       }
       // Convert Set back to single value for onChange
-      this.handleChange(update.size > 0 ? Array.from(update)[0] : null as T | null)
+      this.handleChange((update.size > 0 ? Array.from(update)[0] : null) as T | T[])
     }
   }
 
@@ -92,7 +99,7 @@ export class OptionGroup<T> extends Editor<T | T[], HTMLFieldSetElement, Props> 
   #handleKeyDown = (event: React.KeyboardEvent<HTMLFieldSetElement>): void => {
     // Handle the onKeyDown prop manually (like the base class does)
     const { onKeyDown } = this.props
-    onKeyDown(event)
+    onKeyDown?.(event)
 
     /*
      * CRITICAL: Use event.currentTarget (the fieldset) instead of this.rootNode
@@ -174,10 +181,14 @@ export class OptionGroup<T> extends Editor<T | T[], HTMLFieldSetElement, Props> 
   override get tag(): 'fieldset' { return 'fieldset' }
 
   override get attributes() {
+    const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy } = this.props as Props & {
+      'aria-label'?: string,
+      'aria-labelledby'?: string,
+    }
     return {
       ...super.attributes,
-      'aria-label': this.props['aria-label'],
-      'aria-labelledby': this.props['aria-labelledby'],
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
       'data-multiple': String(this.props.multiple),
       'data-orientation': this.props.orientation,
       'onKeyDown': this.#handleKeyDown,

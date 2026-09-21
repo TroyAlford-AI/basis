@@ -40,7 +40,7 @@ describe('NumberEditor', () => {
       { description: 'null value', expected: '', value: null },
       { description: 'undefined value', expected: '', value: undefined },
     ])('handles $description in readOnly mode', async ({ expected, value }) => {
-      const { node } = await render(<NumberEditor readOnly value={value} onChange={onChange} />)
+      const { node } = await render(<NumberEditor readOnly value={value as number | undefined} onChange={onChange} />)
 
       const input = node.querySelector('input')
       expect(input).toBeNull()
@@ -167,7 +167,8 @@ describe('NumberEditor', () => {
     })
 
     test('does not apply step when onKeyDown prevents default', async () => {
-      const preventDefaultOnKeyDown = mock((event: React.KeyboardEvent<HTMLElement>) => {
+      const preventDefaultOnKeyDown = mock((...args: unknown[]) => {
+        const event = args[0] as React.KeyboardEvent<HTMLElement>
         event.preventDefault()
         event.defaultPrevented = true
       })
@@ -443,9 +444,9 @@ describe('NumberEditor', () => {
       { description: 'empty decimal', input: '.', output: '.' },
       { description: 'empty decimal', input: '.0', output: '.0' },
     ])('formats $description', async ({ input, output }) => {
-      expect(NumberEditor.formatNumber(input)).toBe(output)
+      expect(NumberEditor.formatNumber(input as string | number)).toBe(output)
       const { node } = await render(<NumberEditor value={input as number} />)
-      expect(node.querySelector('input').value).toBe(output)
+      expect(getInput(node).value).toBe(output)
     })
   })
 
@@ -542,7 +543,7 @@ describe('NumberEditor', () => {
       const { numerics, position, selected } = parseState(expected)
       // @ts-expect-error - value is a string
       const { node } = await render(<NumberEditor initialValue={initialState.numerics} onChange={onChange} />)
-      const input = node.querySelector('input')
+      const input = getInput(node)
       const setSelectionRange = setupInput(input, initial)
 
       await Simulate.keyDown(input, key, onChange)
@@ -569,7 +570,7 @@ describe('NumberEditor', () => {
       const { numerics, position, selected } = parseState(expected)
       // @ts-expect-error - value is a string
       const { node } = await render(<NumberEditor initialValue={initialState.numerics} onChange={onChange} />)
-      const input = node.querySelector('input')
+      const input = getInput(node)
       const setSelectionRange = setupInput(input, initial)
       const { prefix, suffix } = NumberEditor.getCursorPosition(input)
 

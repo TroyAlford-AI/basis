@@ -29,7 +29,7 @@ export function get<O, P extends PathOf<O>>(from: O, path: P, defaultValue?: Typ
     for (let j = parts.length; j > i; j--) {
       const literalKey = parts.slice(i, j).join('.')
       if (value && typeof value === 'object' && literalKey in value) {
-        value = (value as unknown)[literalKey]
+        value = (value as Record<string, unknown>)[literalKey]
         i = j // Skip the parts we just consumed
         foundLiteral = true
         break
@@ -39,7 +39,7 @@ export function get<O, P extends PathOf<O>>(from: O, path: P, defaultValue?: Typ
     // If no literal key was found, try the current part
     if (!foundLiteral && i < parts.length) {
       const currentPart = parts[i]
-      value = value?.[currentPart]
+      value = (value as Record<string, unknown> | null | undefined)?.[currentPart]
       if (value === undefined) return defaultValue as unknown
       i++
     }

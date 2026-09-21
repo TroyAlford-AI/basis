@@ -34,14 +34,14 @@ beforeEach(() => {
   })
 
   // Mock history API to avoid security restrictions in tests
-  const mockPushState = (_, __, url?: string) => {
+  const mockPushState = (_data: unknown, _unused: string, url?: string) => {
     if (url) {
       const newURL = new URL(url, 'https://example.com')
       currentLocation = newURL
     }
   }
 
-  const mockReplaceState = (_, __, url?: string) => {
+  const mockReplaceState = (_data: unknown, _unused: string, url?: string) => {
     if (url) {
       const newURL = new URL(url, 'https://example.com')
       currentLocation = newURL

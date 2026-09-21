@@ -39,7 +39,7 @@ export class Tag extends Component<Props, HTMLSpanElement> {
   #handleRemove = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     event.preventDefault()
     event.stopPropagation()
-    this.props.onRemove(event)
+    this.props.onRemove?.(event)
   }
 
   content(): React.ReactNode {

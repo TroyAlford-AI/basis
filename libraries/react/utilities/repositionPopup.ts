@@ -5,7 +5,7 @@ interface Options {
   offset?: number,
 }
 
-const OPTIONS = new Map<HTMLElement, Options>()
+const OPTIONS = new Map<HTMLElement, Options | undefined>()
 const UPDATERS = new Map<HTMLElement, () => void>()
 
 /**

@@ -203,9 +203,10 @@ export class Theme extends Component<Props> {
     const variables = Object.entries(theme)
       .filter(([, values]) => values && typeof values === 'object')
       .flatMap(([category, values]) => this.processObject(category, values as Record<string, unknown>))
-    variables.push(`--basis-color-contrast: ${Color.from(theme.color.primary).contrast()};`)
-    variables.push(`--basis-color-danger-contrast: ${Color.from(theme.color.danger).contrast()};`)
-    variables.push(`--basis-color-success-contrast: ${Color.from(theme.color.success).contrast()};`)
+    const { color } = theme as { color: NonNullable<Props['color']> }
+    variables.push(`--basis-color-contrast: ${Color.from(color.primary as string).contrast()};`)
+    variables.push(`--basis-color-danger-contrast: ${Color.from(color.danger as string).contrast()};`)
+    variables.push(`--basis-color-success-contrast: ${Color.from(color.success as string).contrast()};`)
 
     return name?.trim()
       ? `:root [data-theme="${name}"] { ${variables.join('\n')} }`

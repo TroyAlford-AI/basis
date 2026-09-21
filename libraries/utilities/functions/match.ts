@@ -153,11 +153,13 @@ class Match<Value, Return = unknown, Narrowed = unknown> {
       : predicate
   }
 
-  private evaluate<M>(matcher: Matcher<M>): boolean {
+  private evaluate(matcher: unknown): boolean {
     const queue: [unknown, unknown][] = [[matcher, this.value]]
 
     while (queue.length) {
-      const [matchOn, value] = queue.shift()
+      const next = queue.shift()
+      if (!next) continue
+      const [matchOn, value] = next
 
       if (matchOn === value) continue
 
@@ -200,7 +202,7 @@ class Match<Value, Return = unknown, Narrowed = unknown> {
           if (isNaN(index) || index < 0 || index >= value.length) return false
 
           // Push the corresponding pairs into the queue for further evaluation
-          queue.push([indices[key], value[index]])
+          queue.push([indices[key as `${number}`], value[index]])
         }
 
         continue
@@ -255,7 +257,7 @@ class Match<Value, Return = unknown, Narrowed = unknown> {
   }
   #isNumberMatcher(matcher: unknown): matcher is NumberMatcher {
     if (typeof matcher === 'number') return true
-    return typeof matcher === 'object' && ('max' in matcher || 'min' in matcher)
+    return typeof matcher === 'object' && ('max' in (matcher as object) || 'min' in (matcher as object))
   }
   #isObject<O>(o: unknown): o is O {
     return typeof o === 'object' && o !== null

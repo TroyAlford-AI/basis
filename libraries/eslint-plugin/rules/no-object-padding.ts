@@ -16,20 +16,22 @@ export const noObjectPadding: Rule.RuleModule = {
         const first = node.properties[0]
         const last = node.properties[node.properties.length - 1]
         if (!first.range || !last.range) return
+        const firstRange = first.range
+        const lastRange = last.range
 
         const code = sourceCode.text.slice(open.range[1], close.range[0])
         const lines = code.split('\n')
         if (lines.length === 1) return
 
-        const opening = sourceCode.text.slice(open.range[0] - 1, first.range[0])
-        const closing = sourceCode.text.slice(last.range[1] - 1, close.range[0])
+        const opening = sourceCode.text.slice(open.range[0] - 1, firstRange[0])
+        const closing = sourceCode.text.slice(lastRange[1] - 1, close.range[0])
         const hasLeading = WHITESPACE_LINE.test(opening)
         const hasTailing = WHITESPACE_LINE.test(closing)
 
         if (hasLeading) {
           context.report({
             fix: fixer => fixer.replaceTextRange(
-              [open.range[0] - 1, first.range[0]],
+              [open.range[0] - 1, firstRange[0]],
               opening.replace(WHITESPACE_LINE, ''),
             ),
             messageId: 'unexpectedPaddingStart',
@@ -40,7 +42,7 @@ export const noObjectPadding: Rule.RuleModule = {
         if (hasTailing) {
           context.report({
             fix: fixer => fixer.replaceTextRange(
-              [last.range[1] - 1, close.range[0]],
+              [lastRange[1] - 1, close.range[0]],
               closing.replace(WHITESPACE_LINE, ''),
             ),
             messageId: 'unexpectedPaddingEnd',

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
 
 enum OptionType {
@@ -20,7 +21,13 @@ interface Props<T> {
  * Individual option component for use within an OptionGroup.
  * Extends the Editor base class to provide boolean state management.
  */
-export class Option<T> extends Editor<boolean, HTMLLabelElement, Props<T>> {
+export class Option<T, Field extends string = string> extends Editor<
+  boolean,
+  HTMLLabelElement,
+  Props<T>,
+  TState<boolean>,
+  Field
+> {
   static displayName = 'OptionGroup.Option'
   static Type = OptionType
 

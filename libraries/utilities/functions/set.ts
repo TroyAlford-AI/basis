@@ -15,7 +15,7 @@ export function set<
 >(object: O, path: P, value: V): O {
   const keys = String(path).split('.')
 
-  let current = object
+  let current = object as Record<string, unknown>
   keys.forEach((key, index) => {
     if (index === keys.length - 1) {
       current[key] = value
@@ -23,7 +23,7 @@ export function set<
       current[key] = {}
     }
 
-    current = current[key]
+    current = current[key] as Record<string, unknown>
   })
 
   return object

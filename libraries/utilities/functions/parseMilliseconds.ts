@@ -27,7 +27,7 @@ const ZERO: TimeComponents = {
  * @param milliseconds The milliseconds to parse.
  * @returns The parsed time components.
  */
-export function parseMilliseconds(milliseconds: number): TimeComponents {
+export function parseMilliseconds(milliseconds: unknown): TimeComponents {
   if (typeof milliseconds !== 'number') return { ...ZERO }
   if (Number.isNaN(milliseconds)) return { ...ZERO }
   if ([Infinity, -Infinity].includes(milliseconds)) return { ...ZERO }

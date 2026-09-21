@@ -102,8 +102,8 @@ export const run = (command: string[], cwd: string, env: Record<string, string> 
     stdout: 'pipe',
   })
 
-  const stdout = result.stdout.toString()
-  const stderr = result.stderr.toString()
+  const stdout = result.stdout?.toString() ?? ''
+  const stderr = result.stderr?.toString() ?? ''
   if (!result.success) {
     throw new Error(`command failed (${result.exitCode}): ${command.join(' ')}\n${stdout}\n${stderr}`)
   }

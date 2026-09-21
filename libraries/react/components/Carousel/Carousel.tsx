@@ -128,25 +128,26 @@ export class Carousel extends Component<Props, HTMLDivElement, State> {
         const url = props.src
         const altText = props.alt || props.altText || this.props.altText
 
-        let align = props['data-align']
-        let size = props['data-size']
+        const dataProps = props as Image['props'] & { 'data-align'?: string, 'data-size'?: string }
+        let align: string | undefined = dataProps['data-align']
+        let size: string | undefined = dataProps['data-size']
 
         if (element.type === Image) {
           align = props.align
           size = props.size
         }
 
-        align = match(align)
+        const normalizedAlign: Align | undefined = match(align)
           .when(v => Object.values(Align).includes(v as Align)).then(v => v as Align)
-          .when(v => Object.keys(Align).includes(v)).then(v => Align[v as keyof typeof Align])
+          .when(v => Object.keys(Align).includes(v as string)).then(v => Align[v as keyof typeof Align])
           .else(undefined)
 
-        size = match(size)
+        const normalizedSize: Size | undefined = match(size)
           .when(v => Object.values(Size).includes(v as Size)).then(v => v as Size)
-          .when(v => Object.keys(Size).includes(v)).then(v => Size[v as keyof typeof Size])
+          .when(v => Object.keys(Size).includes(v as string)).then(v => Size[v as keyof typeof Size])
           .else(undefined)
 
-        return { align, altText, size, url }
+        return { align: normalizedAlign, altText, size: normalizedSize, url }
       })
 
     return [
@@ -225,7 +226,7 @@ export class Carousel extends Component<Props, HTMLDivElement, State> {
    * Handles image click events for opening lightbox and navigation
    * @param event - The mouse event.
    */
-  handleImageClick = async (event: React.MouseEvent<HTMLImageElement>): Promise<void> => {
+  handleImageClick = async (event: React.MouseEvent<HTMLDivElement>): Promise<void> => {
     if (event.button !== 0) return
 
     if (!this.state.lightbox) {
@@ -240,7 +241,7 @@ export class Carousel extends Component<Props, HTMLDivElement, State> {
    * Handles middle-click to open image in new tab
    * @param event - The mouse event.
    */
-  handleImageMouseDown = (event: React.MouseEvent<HTMLImageElement>): void => {
+  handleImageMouseDown = (event: React.MouseEvent<HTMLDivElement>): void => {
     if (event.button !== 1) return
     window.open(this.currentImage?.url, '_blank')
   }

@@ -1,10 +1,19 @@
 /**
+ * Encodes a nil value to null
+ * @param value the value to encode
+ * @returns null
+ */
+export function encode(value: null | undefined): null
+
+/**
  * Encodes a value into a hashed string
  * @param value the value to encode
  * @returns the encoded value
  */
-export function encode<V = unknown>(value: V): `H-${string}` {
-  if ([null, undefined].includes(value)) return null
+export function encode<V>(value: V): `H-${string}`
+
+export function encode<V = unknown>(value: V): `H-${string}` | null {
+  if (value === null || value === undefined) return null
 
   const jsonString = JSON.stringify(value)
   const base64 = Buffer.from(jsonString)

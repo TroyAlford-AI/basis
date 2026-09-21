@@ -7,7 +7,7 @@
 export const parseTemplateURI = <Token extends string = string>(
   uri: string,
   template: string,
-): Record<Token, string> => {
+): Record<Token, string> | null => {
   const [templatePath, templateQuery] = template.split('?')
   if (!templatePath) return null
 

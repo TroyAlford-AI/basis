@@ -81,7 +81,7 @@ export class Menu extends Component<Props, HTMLUListElement> {
    * @param direction - The direction to navigate to
    */
   private navigateToItem = (direction: 'next' | 'previous'): void => {
-    const menuItems = Array.from<HTMLDivElement>(this.rootNode.querySelectorAll('.menu-item.component'))
+    const menuItems = Array.from<HTMLDivElement>((this.rootNode as Element).querySelectorAll('.menu-item.component'))
     if (!menuItems.length) return
 
     const currentIndex = menuItems.findIndex(item => item.matches(':focus, :focus-within'))

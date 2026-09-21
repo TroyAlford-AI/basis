@@ -15,7 +15,7 @@ export class AbortablePromise<T> extends Promise<T> implements Abortable<Promise
   constructor(executor: Executor<T>, options: AbortablePromiseOptions = {}) {
     const abortController = new AbortController()
     const { timeout = 1000 } = options
-    let timeoutId: Timer
+    let timeoutId: Timer | undefined = undefined
 
     super((resolve, reject) => {
       // Set up auto-timeout
@@ -28,23 +28,23 @@ export class AbortablePromise<T> extends Promise<T> implements Abortable<Promise
       const originalResolve = resolve
       const originalReject = reject
 
-      resolve = (value: T) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId)
-          timeoutId = undefined
-        }
-        originalResolve(value)
-      }
-
-      reject = (reason?: unknown) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId)
-          timeoutId = undefined
-        }
-        originalReject(reason)
-      }
-
-      executor(resolve, reject, abortController.signal)
+      executor(
+        (value: T) => {
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+            timeoutId = undefined
+          }
+          originalResolve(value)
+        },
+        (reason?: unknown) => {
+          if (timeoutId) {
+            clearTimeout(timeoutId)
+            timeoutId = undefined
+          }
+          originalReject(reason)
+        },
+        abortController.signal,
+      )
     })
 
     this.abortController = abortController

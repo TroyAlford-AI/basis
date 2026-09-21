@@ -236,7 +236,7 @@ describe('match', () => {
 
     test('boolean matchers work with .and()', () => {
       expect(match(42)
-        .when(v => v > 0).and(true).then('positive and true')
+        .when((v: number) => v > 0).and(true).then('positive and true')
         .else('fallback')).toBe('positive and true')
     })
 

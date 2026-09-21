@@ -19,7 +19,7 @@ interface TProps<E extends Element = HTMLDivElement> {
   | Set<string>
   | Record<string, boolean | (() => boolean)>,
   /** An optional ref to the component's root element. */
-  nodeRef?: React.RefObject<E>,
+  nodeRef?: React.RefObject<E | null>,
   /** Callback function called when a key is pressed while the component has focus. */
   onKeyDown?: (event: React.KeyboardEvent<HTMLElement>) => void,
   /** The style of the component. */
@@ -60,7 +60,7 @@ export abstract class Component<
    * @returns a React.HTMLAttributes<Element> object
    * @example get attributes() { return { tabIndex: 0 } }
    */
-  get attributes() {
+  get attributes(): Record<string, unknown> {
     return {
       'data-theme': this.props.theme,
       'style': this.props.style,
@@ -92,7 +92,7 @@ export abstract class Component<
   readonly state = this.defaultState
 
   #nodeRef = React.createRef<Element>()
-  get nodeRef(): React.RefObject<Element> {
+  get nodeRef(): React.RefObject<Element | null> {
     return this.props.nodeRef ?? this.#nodeRef
   }
 
@@ -140,7 +140,8 @@ export abstract class Component<
   }
 
   get mixins(): Mixin<Props>[] {
-    return Array.from((this.constructor as typeof Component).mixins)
+    // Mixins are declared against the concrete component's props; the static registry is untyped.
+    return (Array.from((this.constructor as typeof Component).mixins) as Mixin<Props>[])
       // ensure post mixins are applied last
       .sort((a, b) => (a.post && !b.post ? 1 : -1))
   }
@@ -169,7 +170,7 @@ export abstract class Component<
       <Tag // @ts-expect-error - we are assuming a props match
         ref={nodeRef ?? this.nodeRef}
         {...this.attributes}
-        className={classNames(className, this.classNames)}
+        className={classNames(className ?? '', this.classNames)}
       >
         {this.content(children)}
       </Tag>
@@ -187,7 +188,7 @@ export abstract class Component<
    * @param event The keyboard event.
    */
   protected handleKeyDown(event: React.KeyboardEvent<HTMLElement>): void {
-    this.props.onKeyDown(event)
+    this.props.onKeyDown?.(event)
   }
 
   /**

@@ -11,6 +11,9 @@ import type { ConfigWithExtends } from 'typescript-eslint'
 import pluginTypescript from 'typescript-eslint'
 import pluginBasis from './rules'
 
+/** A single plugin entry accepted by the flat config's `plugins` map */
+type PluginEntry = NonNullable<ConfigWithExtends['plugins']>[string]
+
 /** Plugin options */
 interface PluginOptions {
   /** Files to include */
@@ -35,10 +38,10 @@ const plugin = (options: PluginOptions): ConfigWithExtends => {
       '@basis': pluginBasis,
       '@import-newlines': pluginImportNewlines,
       '@jsdoc': pluginJSDoc,
-      '@stylistic': pluginStylistic as unknown,
-      '@stylistic/js': pluginStylistic as unknown,
-      '@stylistic/jsx': pluginStylistic as unknown,
-      '@stylistic/ts': pluginStylistic as unknown,
+      '@stylistic': pluginStylistic as unknown as PluginEntry,
+      '@stylistic/js': pluginStylistic as unknown as PluginEntry,
+      '@stylistic/jsx': pluginStylistic as unknown as PluginEntry,
+      '@stylistic/ts': pluginStylistic as unknown as PluginEntry,
       '@typescript-eslint': pluginTypescript.plugin,
       'perfectionist': pluginPerfectionist,
       'simple-import-sort': pluginImportSort,

@@ -42,11 +42,11 @@ export class MenuItem<P = unknown> extends Component<ItemProps<P> & P> {
     if (disabled) return
 
     match(event.type)
-      .when('click').then(() => onActivate(event, this))
+      .when('click').then(() => onActivate?.(event, this))
       .when('keydown').then(() => {
         const { key } = event as React.KeyboardEvent
         if (![Keyboard.Enter, Keyboard.Space].includes(key as Keyboard)) return
-        onActivate(event, this)
+        onActivate?.(event, this)
       })
   }
 }

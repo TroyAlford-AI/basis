@@ -1,6 +1,6 @@
 interface Options {
   characters: string,
-  length: number,
+  length?: number,
   padWith: string,
   prefix: string,
 }
@@ -13,14 +13,24 @@ const DEFAULTS: Options = {
 }
 
 /**
+ * Hashes a nil value to null
+ * @param value the value to hash
+ * @param options the options to hash with
+ * @returns null
+ */
+export function hash(value: null | undefined, options?: Partial<Options>): null
+
+/**
  * Hashes a value into a string
  * @param value the value to hash
  * @param options the options to hash with
  * @returns the hashed value
  */
-export function hash(value: unknown, options: Partial<Options> = {}): string {
+export function hash(value: unknown, options?: Partial<Options>): string
+
+export function hash(value: unknown, options: Partial<Options> = {}): string | null {
   const { characters, length, padWith, prefix }: Options = { ...DEFAULTS, ...options }
-  if ([null, undefined].includes(value)) return null
+  if (value === null || value === undefined) return null
 
   const json = JSON.stringify(value)
   let number = 0

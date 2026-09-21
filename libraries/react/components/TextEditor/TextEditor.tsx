@@ -9,6 +9,7 @@ import type { IPrefixSuffix } from '../../mixins/PrefixSuffix'
 import { PrefixSuffix } from '../../mixins/PrefixSuffix'
 import { Keyboard } from '../../types/Keyboard'
 import type { Mixin } from '../../types/Mixin.ts'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
 
 import './TextEditor.styles.ts'
@@ -48,7 +49,13 @@ interface Props extends IAccessible, IPrefixSuffix, IPlaceholder, IFocusable {
 }
 
 /** Text input editor component that extends the Editor base class. */
-export class TextEditor extends Editor<string, HTMLInputElement | HTMLTextAreaElement, Props> {
+export class TextEditor<Field extends string = string> extends Editor<
+  string,
+  HTMLInputElement | HTMLTextAreaElement,
+  Props,
+  TState<string>,
+  Field
+> {
   static displayName = 'TextEditor'
   /** Text wrapping options for textarea elements. */
   static readonly Wrap = Wrap

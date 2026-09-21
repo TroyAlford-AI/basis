@@ -73,14 +73,14 @@ export class Button extends Component<Props, HTMLButtonElement> {
 
     const handled = match(event.type)
       .when('click').then(() => {
-        onActivate(event)
+        onActivate?.(event)
         return true
       })
       .when('keydown').then(() => {
         const { key } = event as React.KeyboardEvent
         if (![Keyboard.Enter, Keyboard.Space].includes(key as Keyboard)) return false
 
-        onActivate(event)
+        onActivate?.(event)
         return true
       })
       .else(noop)

@@ -19,7 +19,7 @@ export class Server {
   static NotFound: Response = new Response(null, { status: 404, statusText: 'Not Found' })
 
   #apis = new Map<string, APIRoute>()
-  #assets: string = null
+  #assets: string | null = null
   #builder: Builder
   #modules = new Map<string, string>()
   #root: string = process.cwd()
@@ -105,17 +105,19 @@ export class Server {
    * @returns The module response.
    */
   async handleModule(uri: URI): Promise<Response> {
-    if (!this.#modules.has(uri.route)) {
+    let content = this.#modules.get(uri.route)
+
+    if (content === undefined) {
       const response = await fetch(`https://unpkg.com/${uri.route}`)
       if (!response.ok) return Server.NotFound
 
-      const text = await response.text()
-      this.#modules.set(uri.route, text)
+      content = await response.text()
+      this.#modules.set(uri.route, content)
     }
 
-    return new Response(this.#modules.get(uri.route), {
+    return new Response(content, {
       headers: {
-        'Content-Length': this.#modules.get(uri.route).length.toString(),
+        'Content-Length': content.length.toString(),
         'Content-Type': 'application/javascript',
         'Via': '@basis/server; proxying unpkg.com',
       },
@@ -161,7 +163,7 @@ export class Server {
       fetch: async (request: Request) => {
         // Check for WebSocket upgrade requests first
         if (request.headers.get('upgrade') === 'websocket') {
-          const upgraded = this.#server.upgrade(request)
+          const upgraded = (this.#server as BunServer<undefined>).upgrade(request)
           if (!upgraded) {
             return new Response('WebSocket upgrade failed', { status: 400 })
           }
@@ -180,14 +182,14 @@ export class Server {
       },
       port,
       websocket: {
-        close: ws => {
+        close: (ws: ServerWebSocket<undefined>) => {
           console.log('[WS] Client disconnected')
           this.#websockets.delete(ws)
         },
-        message: (ws, message) => {
+        message: (ws: ServerWebSocket<undefined>, message: string | Buffer) => {
           console.log('[WS] Received message:', message)
         },
-        open: ws => {
+        open: (ws: ServerWebSocket<undefined>) => {
           console.log('[WS] Client connected')
           this.#websockets.add(ws)
         },
@@ -279,7 +281,10 @@ export class Server {
     template: string,
     handler: (params: Params) => Response,
   ): Server {
-    this.#apis.set(template, { handler, verbs: new Set(verbs) })
+    this.#apis.set(template, {
+      handler: handler as unknown as (params: object) => Response,
+      verbs: new Set(verbs),
+    })
     return this
   }
 

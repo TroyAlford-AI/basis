@@ -8,18 +8,19 @@ interface ReturnType { message: () => string, pass: boolean }
  * @returns the result of the check
  */
 export function toHaveAttribute(
-  node: HTMLElement | null,
+  node: unknown,
   name: string,
   value?: string | RegExp,
 ): ReturnType {
-  if (!node) {
+  const element = node as HTMLElement | null
+  if (!element) {
     return {
       message: () => 'expected element to exist but received null',
       pass: false,
     }
   }
 
-  const actual = node.getAttribute(name)
+  const actual = element.getAttribute(name)
   let message = ''
   let pass: boolean
 
@@ -28,7 +29,7 @@ export function toHaveAttribute(
     pass = actual !== null
   } else if (value instanceof RegExp) {
     message = `expected ${actual} to equal ${value}`
-    pass = value.test(actual)
+    pass = value.test(actual as string)
   } else {
     message = `expected ${actual} to equal ${value}`
     pass = actual === value

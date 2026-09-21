@@ -19,7 +19,7 @@ describe('Redirect', () => {
     })
 
     replaceState = spyOn(window.history, 'replaceState').mockImplementation((state, title, url) => {
-      const [path, search] = url.toString().split('?')
+      const [path, search] = (url as string).toString().split('?')
       window.location.pathname = path
       window.location.search = search ? '?' + search : ''
       window.location.href = 'http://example.com' + window.location.pathname + window.location.search

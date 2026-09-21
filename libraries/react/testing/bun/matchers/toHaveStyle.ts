@@ -6,11 +6,16 @@ type StyleMatcher = string | RegExp | Partial<CSSStyleDeclaration>
  * @param styles the styles to check for
  * @returns the result of the check
  */
-export function toHaveStyle(node: HTMLElement, ...styles: StyleMatcher[]) {
+export function toHaveStyle(node: unknown, ...styles: StyleMatcher[]) {
+  const element = node as HTMLElement
+
   const pass = styles.every(style => {
-    if (typeof style === 'string') return node.style.cssText.includes(style)
-    if (style instanceof RegExp) return style.test(node.style.cssText)
-    if (typeof style === 'object') return Object.entries(style).every(([key, value]) => node.style[key] === value)
+    if (typeof style === 'string') return element.style.cssText.includes(style)
+    if (style instanceof RegExp) return style.test(element.style.cssText)
+    if (typeof style === 'object') {
+      return Object.entries(style)
+        .every(([key, value]) => (element.style as unknown as Record<string, unknown>)[key] === value)
+    }
     return false
   })
 

@@ -6,8 +6,8 @@ import type { IFocusable } from '../../mixins/Focusable'
 import { Focusable } from '../../mixins/Focusable'
 import type { Mixin } from '../../types/Mixin'
 import { DropdownMenu } from '../DropdownMenu/DropdownMenu'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
-import type { MenuItem } from '../Menu/MenuItem.tsx'
 
 import './EnumEditor.styles.ts'
 
@@ -33,7 +33,13 @@ interface EnumOption<T extends EnumType> {
  * Enum input editor component that extends the Editor base class.
  * Displays enum values in a dropdown with toggleable options.
  */
-export class EnumEditor<T extends EnumType> extends Editor<T[keyof T], HTMLDivElement, Props<T>> {
+export class EnumEditor<T extends EnumType, Field extends string = string> extends Editor<
+  T[keyof T],
+  HTMLDivElement,
+  Props<T>,
+  TState<T[keyof T]>,
+  Field
+> {
   static displayName = 'EnumEditor'
   static get mixins(): Set<Mixin> {
     return super.mixins
@@ -98,7 +104,7 @@ export class EnumEditor<T extends EnumType> extends Editor<T[keyof T], HTMLDivEl
     )
   }
 
-  #handleChange = (_, menuItem: MenuItem<{ data: T[keyof T] }>): void => {
+  #handleChange = (_event: React.SyntheticEvent, menuItem: { props: { data: T[keyof T] } }): void => {
     this.handleChange(menuItem.props.data)
   }
 

@@ -44,8 +44,9 @@ export class IconsDocs extends Documentation<State> {
 
   // Get all icon components (excluding Icon, IconBase, and utility components)
   get iconComponents() {
-    return Object.entries(Icons as unknown as Record<string, ComponentType<IconProps>>)
-      .filter(([name]) => typeof Icons[name] === 'function')
+    const icons = Icons as unknown as Record<string, ComponentType<IconProps>>
+    return Object.entries(icons)
+      .filter(([, icon]) => typeof icon === 'function')
       .filter(([name]) => {
         if (this.current.filterText) {
           return name.toLowerCase().includes(this.current.filterText.toLowerCase())

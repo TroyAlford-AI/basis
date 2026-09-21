@@ -6,10 +6,10 @@ import { Component } from './Component'
 type Tag = keyof React.JSX.IntrinsicElements
 
 class TestComponent extends Component<{ tag?: Tag }> {
-  static displayName = null
+  static displayName: string | null = null
   get classNames() { return super.classNames.add(' foo bar baz ') }
   get tag(): Tag { return this.props.tag ?? 'div' }
-  content(children) { return children ?? 'content' }
+  content(children?: React.ReactNode): React.ReactNode { return children ?? 'content' }
 }
 
 describe('Component', () => {

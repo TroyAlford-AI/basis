@@ -7,7 +7,7 @@ import { TagsEditor } from './TagsEditor'
 describe('TagsEditor', () => {
   const getInput = (container: ParentNode) => (
     container.querySelector<HTMLInputElement | HTMLTextAreaElement>('.text-editor.component .value')
-  )
+  ) as HTMLInputElement | HTMLTextAreaElement
   const getTags = (container: ParentNode) => container.querySelectorAll('.tag.component')
   const getRemoveButtons = (container: ParentNode) => container.querySelectorAll('.remove')
 

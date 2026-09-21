@@ -3,9 +3,9 @@ import { Code } from '../components/Code'
 import { Documentation } from '../components/Documentation'
 
 interface State {
-  allowIndeterminate: boolean,
-  checked: boolean,
-  disabled: boolean,
+  allowIndeterminate: boolean | null,
+  checked: boolean | null,
+  disabled: boolean | null,
   label: string,
 }
 
@@ -66,8 +66,8 @@ export class CheckboxEditorDocs extends Documentation<State> {
             }}
             >
               <CheckboxEditor
-                allowIndeterminate={this.current.allowIndeterminate}
-                disabled={this.current.disabled}
+                allowIndeterminate={this.current.allowIndeterminate ?? false}
+                disabled={this.current.disabled ?? false}
                 field="checked"
                 value={this.current.checked}
                 onChange={this.handleField}

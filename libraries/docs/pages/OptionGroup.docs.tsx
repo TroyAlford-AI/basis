@@ -6,8 +6,8 @@ import { Documentation } from '../components/Documentation'
 
 interface State {
   customOptions: string,
-  optionType: 'option' | 'toggle',
-  orientation: Orientation,
+  optionType: 'option' | 'toggle' | ('option' | 'toggle')[],
+  orientation: Orientation | Orientation[],
   readOnly: boolean,
   selectedValue: string | string[],
 }
@@ -146,7 +146,7 @@ export class OptionGroupDocs extends Documentation<State> {
               <OptionGroup
                 field="selectedValue"
                 multiple={false}
-                orientation={orientation}
+                orientation={Array.isArray(orientation) ? orientation[0] : orientation}
                 readOnly={readOnly}
                 value={selectedValue}
                 onChange={this.handleField}

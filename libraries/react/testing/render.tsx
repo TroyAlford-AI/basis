@@ -2,8 +2,8 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { noop } from '@basis/utilities'
 
-type Class<T> = new (...args: unknown[]) => T
-type Fn<T> = (...args: unknown[]) => T
+type Class<T> = new (...args: never[]) => T
+type Fn<T> = (...args: never[]) => T
 type Ctor<T> = Class<T> | Fn<T>
 interface Fiber {
   child?: Fiber,
@@ -78,10 +78,10 @@ interface Rendered<
  * onUnmounted Callback fired before unmount (cleans up).
  */
 class Mounter<C> extends React.Component<{
-  childRef: React.RefObject<C>,
-  children: React.ReactElement<{ ref?: React.RefObject<C> }>,
-  onMounted: (instance: React.RefObject<C>) => void,
-  onUnmounted: (instance: React.RefObject<C>) => void,
+  childRef: React.RefObject<C | null>,
+  children: React.ReactElement<{ ref?: React.Ref<C> }>,
+  onMounted: (instance: React.RefObject<C | null>) => void,
+  onUnmounted: (instance: React.RefObject<C | null>) => void,
 }, { children: React.ReactNode, error: unknown }> {
   static defaultProps = {
     onMounted: noop,
@@ -95,7 +95,7 @@ class Mounter<C> extends React.Component<{
     error: undefined,
   }
 
-  onUpdated: (ref: React.RefObject<C>) => void = noop
+  onUpdated: (ref: React.RefObject<C | null>) => void = noop
 
   /**
    * Fires after first mount; resolves the initial render() promise.
@@ -163,16 +163,16 @@ export async function render<
   const childRef = React.createRef<C>()
 
   // Establish promise/callback for the initial mount
-  let onMounted: (value: React.RefObject<C>) => void
-  const onMountedPromise = new Promise<React.RefObject<C>>(resolve => { onMounted = resolve })
+  let onMounted!: (value: React.RefObject<C | null>) => void
+  const onMountedPromise = new Promise<React.RefObject<C | null>>(resolve => { onMounted = resolve })
 
   // Establish promise/callback for the unmount
-  let onUnmounted: (value: React.RefObject<C>) => void
-  new Promise<React.Ref<C>>(resolve => { onUnmounted = resolve })
+  let onUnmounted!: (value: React.RefObject<C | null>) => void
+  new Promise<React.RefObject<C | null>>(resolve => { onUnmounted = resolve })
     .then(() => rootDOM.unmount())
 
   // Establish promise/callback for the updates.
-  let onUpdated: () => void
+  let onUpdated!: () => void
   let hasUpdated = false
   /*
    * Shared "update flush" promise; reused for all pending update() calls
@@ -188,7 +188,7 @@ export async function render<
     <Mounter<C>
       ref={mounterRef}
       childRef={childRef}
-      children={children}
+      children={children as React.ReactElement<{ ref?: React.Ref<C> }>}
       onMounted={onMounted}
       onUnmounted={onUnmounted}
     />,
@@ -198,7 +198,8 @@ export async function render<
   await onMountedPromise
 
   // Set the onUpdated callback on the mounter ref
-  mounterRef.current.onUpdated = onUpdated
+  const mounter = mounterRef.current as Mounter<C>
+  mounter.onUpdated = onUpdated
 
   /**
    * Search for a component instance in the rendered tree
@@ -215,8 +216,9 @@ export async function render<
     if (!instance) return null
 
     const fiberKey = Object.keys(instance).find(k => k.startsWith('__reactFiber$'))
-    const fiber = fiberKey ? instance[fiberKey] : undefined
-    const queue: Fiber[] = [fiber]
+    // React attaches its fiber to the instance under a versioned private key.
+    const fiber = fiberKey ? Reflect.get(instance, fiberKey) as Fiber | undefined : undefined
+    const queue: Fiber[] = fiber ? [fiber] : []
 
     while (queue.length) {
       const node = queue.shift()
@@ -241,7 +243,8 @@ export async function render<
       await onMountedPromise
       return Promise.all(Array.from(search<I>(ctor)))
     },
-    get instance() { return childRef.current },
+    // The public type is `C`; function components simply return null at runtime.
+    get instance() { return childRef.current as C },
     get node(): N {
       return rootElement.children.length > 1
         ? Array.from(rootElement.children) as N
@@ -266,10 +269,10 @@ export async function render<
         hasUpdated = false
         updatePromise = new Promise<void>(resolve => { onUpdated = resolve })
           .then(() => { hasUpdated = true })
-        mounterRef.current.onUpdated = onUpdated
+        mounter.onUpdated = onUpdated
       }
 
-      mounterRef.current.setState({ children: update })
+      mounter.setState({ children: update })
 
       let finished = false
       updatePromise.then(() => { finished = true })

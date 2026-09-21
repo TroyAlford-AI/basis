@@ -91,7 +91,7 @@ describe('AbortablePromise', () => {
       setTimeout(() => reject(new Error('test error')), 10)
     })
 
-    const result = await promise.catch((error: Error) => `caught: ${error.message}`)
+    const result = await promise.catch((reason: unknown) => `caught: ${(reason as Error).message}`)
     expect(result).toBe('caught: test error')
   })
 
@@ -137,11 +137,11 @@ describe('AbortablePromise', () => {
       })
     }, { timeout: 200 })
 
-    const chainedPromise = promise.catch((error: Error) => {
-      if (error.message === 'AbortError') {
-        throw error // Re-throw abort errors
+    const chainedPromise = promise.catch((reason: unknown) => {
+      if ((reason as Error).message === 'AbortError') {
+        throw reason // Re-throw abort errors
       }
-      return `caught: ${error.message}`
+      return `caught: ${(reason as Error).message}`
     })
 
     // Abort the original promise

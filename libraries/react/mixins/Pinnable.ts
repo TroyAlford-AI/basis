@@ -24,11 +24,11 @@ function apply<E extends HTMLElement | SVGElement, S>(
 
   match(pin)
     .when(Pin.Left).then(() => {
-      delete rootNode.style.right
+      delete (rootNode.style as Partial<CSSStyleDeclaration>).right
       rootNode.style.left = `${CSS.px(rootNode.offsetLeft)}`
     })
     .when(Pin.Right).then(() => {
-      delete rootNode.style.left
+      delete (rootNode.style as Partial<CSSStyleDeclaration>).left
       // Calculate right position: parent width - (element left + element width)
       const parent = rootNode.parentElement
       if (parent) {
@@ -42,14 +42,14 @@ function apply<E extends HTMLElement | SVGElement, S>(
       }
     })
     .else(() => {
-      delete rootNode.style.left
-      delete rootNode.style.right
+      delete (rootNode.style as Partial<CSSStyleDeclaration>).left
+      delete (rootNode.style as Partial<CSSStyleDeclaration>).right
     })
 }
 
 /** Mixin for pinnable elements. */
 export const Pinnable: Mixin<IPinnable> = {
-  attributes(props): Record<string, string> {
+  attributes(props): Record<string, string | undefined> {
     return {
       'data-pin': props.pin,
     }

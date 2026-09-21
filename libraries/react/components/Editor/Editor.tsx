@@ -2,9 +2,9 @@ import type { PathOf, TypeAt } from '@basis/utilities'
 import { clone, deepEquals, isNil, noop, set } from '@basis/utilities'
 import { Component } from '../Component/Component'
 
-interface TProps<Value> {
-  /** Field identifier (number or string) */
-  field?: string,
+interface TProps<Value, Field extends string = string> {
+  /** Field identifier (a key path into the owning editor's value, when known) */
+  field?: Field,
   /** Initial value for uncontrolled mode */
   initialValue?: Value,
   /** Change handler */
@@ -12,7 +12,7 @@ interface TProps<Value> {
     /** The new value */
     value: Value,
     /** The field identifier */
-    field: string,
+    field: Field,
     /**
      * The editor instance. Typed as `unknown` to avoid circular TS dependencies.
      * @example
@@ -30,12 +30,12 @@ interface TProps<Value> {
   value?: Value,
 }
 
-interface TState<Value> {
+export interface TState<Value> {
   /** Current value in uncontrolled mode */
   current: Value,
 }
 
-type P<V, T> = TProps<V> & T
+type P<V, T, F extends string = string> = TProps<V, F> & T
 type S<V, T> = TState<V> & T
 
 /**
@@ -47,9 +47,10 @@ type S<V, T> = TState<V> & T
 export abstract class Editor<
   Value,
   Element extends HTMLElement = HTMLElement,
-  Props = TProps<Value>,
+  Props = TProps<Value, string>,
   State = TState<Value>,
-> extends Component<P<Value, Props>, Element, S<Value, State>> {
+  Field extends string = string,
+> extends Component<P<Value, Props, Field>, Element, S<Value, State>> {
   static defaultProps: Partial<TProps<unknown> & Component['props']> = {
     ...super.defaultProps,
     onChange: noop,
@@ -74,7 +75,7 @@ export abstract class Editor<
     }
   }
 
-  get attributes(): (typeof this)['attributes'] {
+  get attributes(): Record<string, unknown> {
     return {
       ...super.attributes,
       'aria-readonly': this.props.readOnly ? 'true' : 'false',
@@ -118,7 +119,8 @@ export abstract class Editor<
    * @param value - The new value
    */
   protected handleChange = async (value: Value): Promise<void> => {
-    const { field = '', onChange = noop } = this.props
+    const { onChange = noop } = this.props
+    const field = (this.props.field ?? '') as Field
     const currentValue = this.current
 
     // Short-circuit if the value is the same instance
@@ -137,13 +139,13 @@ export abstract class Editor<
   }
 
   /**
-   * Updates a nested field value using the provided path
+   * Updates a nested field value using the provided path.
    * @param value - The new value
    * @param path - The path to the nested field
    */
   protected handleField = async <Path extends PathOf<Value>>(
     value: TypeAt<Value, Path>,
-    path: Path,
+    path: Path | (string & {}),
   ): Promise<void> => {
     const update = clone(this.current)
 
@@ -151,7 +153,7 @@ export abstract class Editor<
     const lastPart = parts.pop()
     if (!lastPart) return
 
-    set(update, path, value)
+    set(update, path as Path, value)
     await this.handleChange(update)
   }
 

@@ -1,4 +1,4 @@
-import type { BunPlugin } from 'bun'
+import type { BunPlugin, OnLoadResult } from 'bun'
 
 /**
  * A function that takes a module name and returns either a global variable reference
@@ -125,7 +125,7 @@ export function pluginGlobals(globals: PluginGlobalsOptions = {}): BunPlugin {
         { filter: /.*/, namespace: 'globals' },
         args => {
           const contents = generateExport(globals, args.path)
-          return contents === undefined ? null : { contents }
+          return (contents === undefined ? null : { contents }) as unknown as OnLoadResult
         },
       )
     },

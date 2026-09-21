@@ -2,6 +2,13 @@ import { clone } from './clone'
 import { isNil } from './isNil'
 
 /**
+ * Merges a nil value into an empty object.
+ * @param first The value to merge, expected to be nil.
+ * @returns An empty object.
+ */
+export function merge(first: null | undefined): object
+
+/**
  * Merge multiple objects together, with later arguments taking precedence.
  * If a node in a later object has a different type than the corresponding node
  * in an earlier object, it replaces it. If the types match and are both objects,
@@ -22,7 +29,9 @@ import { isNil } from './isNil'
  * )
  * // returns { foo: 'bar' } - different types, so second value replaces first
  */
-export function merge<T = object>(first: T, ...objects: T[]): T {
+export function merge<T = object>(first: T, ...objects: T[]): T
+
+export function merge<T = object>(first: T | null | undefined, ...objects: T[]): T {
   const output = isNil(first) ? {} : clone(first)
   if (objects.length === 0) return output as T
 

@@ -4,6 +4,7 @@ import { Accessible } from '../../mixins/Accessible'
 import type { IFocusable } from '../../mixins/Focusable'
 import { Focusable } from '../../mixins/Focusable'
 import type { Mixin } from '../../types/Mixin'
+import type { TState } from '../Editor/Editor'
 import { Editor } from '../Editor/Editor'
 
 import './ToggleEditor.styles.ts'
@@ -26,7 +27,13 @@ interface Props extends IAccessible, IFocusable {
  * Toggle editor component that extends the Editor base class.
  * Renders a clickable toggle with optional icons and text.
  */
-export class ToggleEditor extends Editor<boolean, HTMLButtonElement, Props> {
+export class ToggleEditor<Field extends string = string> extends Editor<
+  boolean,
+  HTMLButtonElement,
+  Props,
+  TState<boolean>,
+  Field
+> {
   static displayName = 'ToggleEditor'
   static defaultProps = {
     ...super.defaultProps,

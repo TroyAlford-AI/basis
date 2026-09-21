@@ -100,7 +100,7 @@ async function buildPackageWithOptions(name: string, workspace: Workspace) {
       .when('list').then(() => listWorkspaces({ not: values.not, only: values.only }))
       .when('publish').then(async () => {
         if (!values.version) throw new Error('Usage: workspace publish --version <version> [options]')
-        return publishJSR(values)
+        return publishJSR(values as unknown as Parameters<typeof publishJSR>[0])
       })
       .else(() => {
         throw new Error(`Unknown command: ${command}`)
@@ -114,7 +114,7 @@ async function buildPackageWithOptions(name: string, workspace: Workspace) {
     }
     process.exit(0)
   } catch (error) {
-    console.error(error.message)
+    console.error((error as Error).message)
     process.exit(1)
   }
 })()

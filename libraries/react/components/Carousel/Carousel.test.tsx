@@ -108,17 +108,18 @@ describe('Carousel', () => {
 
     test('closes lightbox with escape key', async () => {
       const { instance, update } = await render<Carousel>(<Carousel images={images} />)
-      const imgDiv = instance.rootNode.querySelector<HTMLDivElement>('.image.component')
+      const rootNode = instance.rootNode as HTMLDivElement
+      const imgDiv = rootNode.querySelector<HTMLDivElement>('.image.component')
 
       // Open lightbox first
       imgDiv?.click()
       await update()
-      expect(instance.rootNode.dataset.lightbox).toBe('true')
+      expect(rootNode.dataset.lightbox).toBe('true')
 
       // Close with escape key by calling handleKeyDown directly
       await instance.handleKeyDown({ key: Keyboard.Escape } as React.KeyboardEvent<HTMLDivElement>)
       await update()
-      expect(instance.rootNode.dataset.lightbox).toBe('false')
+      expect(rootNode.dataset.lightbox).toBe('false')
     })
   })
 

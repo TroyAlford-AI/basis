@@ -18,13 +18,11 @@ import './Cell.styles.ts'
 type Props<TRow, TField extends PathOf<TRow> = PathOf<TRow>> = {
   align?: TextAlign,
   column: ColumnProps<TRow, TField>,
-  enum?: Record<string, string | number>,
   field: TField,
   header?: boolean,
   onChange?: (value: unknown, field: string, editor: unknown) => void,
   readOnly?: boolean,
   row: TRow,
-  type?: ColumnType,
   value?: unknown,
 } & IPinnable
 
@@ -40,7 +38,7 @@ export class Cell<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
       ...super.attributes,
       'data-align': this.props.align,
       'data-field': this.props.field,
-      'data-type': this.props.type,
+      'data-type': this.props.column.type,
       'style': {
         minWidth: this.props.column.width ?? undefined,
         width: this.props.column.width ?? '100%',
@@ -63,7 +61,7 @@ export class Cell<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
   }
 
   content(): React.ReactNode {
-    const { column, field, readOnly, row, type = ColumnType.Text } = this.props
+    const { column, field, readOnly, row } = this.props
     const value = this.current
 
     if (column.component) {
@@ -78,7 +76,7 @@ export class Cell<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
       )
     }
 
-    switch (type) {
+    switch (column.type) {
       case ColumnType.Number:
         return super.content(
           <NumberEditor
@@ -103,7 +101,7 @@ export class Cell<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
         return super.content(
           <EnumEditor
             readOnly
-            enum={this.props.enum as Record<string, string | number>}
+            enum={column.enum}
             field={field}
             value={value as string | number}
             onChange={this.handleChange}

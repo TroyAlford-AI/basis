@@ -23,10 +23,10 @@ export interface CellProps<T, R = unknown, F extends PathOf<R> = PathOf<R>> {
   value: T,
 }
 
-export interface ColumnProps<TRow = unknown, TField extends PathOf<TRow> = PathOf<TRow>> {
+/** Props shared by every column type. */
+interface BaseColumnProps<TRow = unknown, TField extends PathOf<TRow> = PathOf<TRow>> {
   align?: TextAlign,
   component?: React.ComponentType<CellProps<TypeAt<TRow, TField>, TRow, TField>>,
-  enum?: Record<string, string | number>,
   field: TField,
   header?: boolean,
   pin?: Pin,
@@ -34,9 +34,27 @@ export interface ColumnProps<TRow = unknown, TField extends PathOf<TRow> = PathO
   sortDirection?: SortDirection | null,
   sortable?: boolean,
   title?: string,
-  type?: ColumnType,
   width?: string | number,
 }
+
+/** Props for an enum column. The `enum` definition is required so cells can render its options. */
+export interface EnumColumnProps<TRow = unknown, TField extends PathOf<TRow> = PathOf<TRow>>
+  extends BaseColumnProps<TRow, TField> {
+  enum: Record<string, string | number>,
+  type: ColumnType.Enum,
+}
+
+/** Props for every non-enum column. An `enum` definition is not applicable. */
+export interface StandardColumnProps<TRow = unknown, TField extends PathOf<TRow> = PathOf<TRow>>
+  extends BaseColumnProps<TRow, TField> {
+  enum?: never,
+  type?: Exclude<ColumnType, ColumnType.Enum>,
+}
+
+/** Props for a table column, discriminated by `type` so enum columns require their `enum`. */
+export type ColumnProps<TRow = unknown, TField extends PathOf<TRow> = PathOf<TRow>> =
+  | EnumColumnProps<TRow, TField>
+  | StandardColumnProps<TRow, TField>
 
 export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
   extends Component<ColumnProps<TRow, TField>> {
@@ -53,8 +71,8 @@ export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
   }
 
   // Static column type components
-  static Boolean<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: ColumnProps<TRow, TField>) {
-    const props = {
+  static Boolean<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: StandardColumnProps<TRow, TField>) {
+    const props: StandardColumnProps<TRow, TField> = {
       ...Column.defaultProps,
       align: TextAlign.Center,
       sortBy: SortBy.Value,
@@ -63,8 +81,8 @@ export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
     }
     return <Column<TRow, TField> {...props} />
   }
-  static Date<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: ColumnProps<TRow, TField>) {
-    const props = {
+  static Date<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: StandardColumnProps<TRow, TField>) {
+    const props: StandardColumnProps<TRow, TField> = {
       ...Column.defaultProps,
       align: TextAlign.Center,
       sortBy: SortBy.Value,
@@ -73,8 +91,8 @@ export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
     }
     return <Column<TRow, TField> {...props} />
   }
-  static DateTime<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: ColumnProps<TRow, TField>) {
-    const props = {
+  static DateTime<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: StandardColumnProps<TRow, TField>) {
+    const props: StandardColumnProps<TRow, TField> = {
       ...Column.defaultProps,
       align: TextAlign.Center,
       sortBy: SortBy.Value,
@@ -83,8 +101,10 @@ export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
     }
     return <Column<TRow, TField> {...props} />
   }
-  static Enum<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: ColumnProps<TRow, TField>) {
-    const props = {
+  static Enum<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(
+    declaration: Omit<EnumColumnProps<TRow, TField>, 'type'>,
+  ) {
+    const props: EnumColumnProps<TRow, TField> = {
       ...Column.defaultProps,
       align: TextAlign.Left,
       sortBy: SortBy.Name,
@@ -94,9 +114,9 @@ export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
     return <Column<TRow, TField> {...props} />
   }
   static Number<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(
-    declaration: ColumnProps<TRow, TField>,
+    declaration: StandardColumnProps<TRow, TField>,
   ) {
-    const props = {
+    const props: StandardColumnProps<TRow, TField> = {
       ...Column.defaultProps,
       align: TextAlign.Right,
       sortBy: SortBy.Value,
@@ -105,8 +125,8 @@ export class Column<TRow, TField extends PathOf<TRow> = PathOf<TRow>>
     }
     return <Column<TRow, TField> {...props} />
   }
-  static Text<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: ColumnProps<TRow, TField>) {
-    const props = {
+  static Text<TRow, TField extends PathOf<TRow> = PathOf<TRow>>(declaration: StandardColumnProps<TRow, TField>) {
+    const props: StandardColumnProps<TRow, TField> = {
       ...Column.defaultProps,
       align: TextAlign.Left,
       sortBy: SortBy.Name,

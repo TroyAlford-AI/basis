@@ -33,7 +33,9 @@ describe('Cell', () => {
   }
 
   test('renders text editor for text type', async () => {
-    const { node } = await render(<Cell {...defaultProps} type={ColumnType.Text} />)
+    const { node } = await render(
+      <Cell {...defaultProps} column={{ field: 'name', type: ColumnType.Text } as ColumnProps<TestRow>} />,
+    )
     expect(node.tagName).toBe('TD')
     expect(node).toHaveClass('table-cell', 'component')
     expect(node).toHaveAttribute('data-field', 'name')
@@ -44,9 +46,8 @@ describe('Cell', () => {
     const { node } = await render(
       <Cell
         {...defaultProps}
-        column={{ field: 'age' } as ColumnProps<TestRow>}
+        column={{ field: 'age', type: ColumnType.Number } as ColumnProps<TestRow>}
         field="age"
-        type={ColumnType.Number}
       />,
     )
     expect(node).toHaveAttribute('data-field', 'age')
@@ -57,9 +58,8 @@ describe('Cell', () => {
     const { node } = await render(
       <Cell
         {...defaultProps}
-        column={{ field: 'active' } as ColumnProps<TestRow>}
+        column={{ field: 'active', type: ColumnType.Boolean } as ColumnProps<TestRow>}
         field="active"
-        type={ColumnType.Boolean}
       />,
     )
     expect(node).toHaveAttribute('data-field', 'active')
@@ -70,10 +70,12 @@ describe('Cell', () => {
     const { node } = await render(
       <Cell
         {...defaultProps}
-        column={{ enum: { admin: 'Admin', user: 'User' }, field: 'role' } as ColumnProps<TestRow>}
-        enum={{ admin: 'Admin', user: 'User' }}
         field="role"
-        type={ColumnType.Enum}
+        column={{
+          enum: { admin: 'Admin', user: 'User' },
+          field: 'role',
+          type: ColumnType.Enum,
+        } as ColumnProps<TestRow>}
       />,
     )
     expect(node).toHaveAttribute('data-field', 'role')
@@ -85,10 +87,9 @@ describe('Cell', () => {
     const { node } = await render(
       <Cell
         {...defaultProps}
-        column={{ field: 'lastLogin' }}
+        column={{ field: 'lastLogin', type: ColumnType.Date }}
         field="lastLogin"
         row={dateRow}
-        type={ColumnType.Date}
       />,
     )
     expect(node).toHaveAttribute('data-field', 'lastLogin')
@@ -102,10 +103,9 @@ describe('Cell', () => {
     const { node } = await render(
       <Cell
         {...defaultProps}
-        column={{ field: 'lastLogin' }}
+        column={{ field: 'lastLogin', type: ColumnType.DateTime }}
         field="lastLogin"
         row={dateRow}
-        type={ColumnType.DateTime}
       />,
     )
     expect(node).toHaveAttribute('data-field', 'lastLogin')

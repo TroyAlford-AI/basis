@@ -165,7 +165,7 @@ export class Table<T extends object = { id: string }>
           {displayData.map((row, index) => (
             <tr key={this.rowId(row, index)}>
               {columns.map(props => {
-                const { field, type } = props
+                const { field } = props
                 const value = get(row, field)
 
                 return (
@@ -173,13 +173,11 @@ export class Table<T extends object = { id: string }>
                     key={field}
                     align={props.align}
                     column={props}
-                    enum={props.enum}
                     field={field}
                     header={props.header}
                     pin={props.pin}
                     readOnly={this.props.readOnly}
                     row={row}
-                    type={type}
                     value={value}
                   />
                 )

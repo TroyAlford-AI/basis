@@ -1,16 +1,16 @@
 import type { PathOf } from '@basis/utilities/types/PathOf'
-import type { ColumnProps } from './Column'
+import type { EnumColumnProps, StandardColumnProps } from './Column'
 import { Column } from './Column'
 import { Table } from './Table'
 
 interface TypedTableInterface<TRow extends object> {
   Column: {
-    Boolean: (props: ColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
-    Date: (props: ColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
-    DateTime: (props: ColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
-    Enum: (props: ColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
-    Number: (props: ColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
-    Text: (props: ColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
+    Boolean: (props: StandardColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
+    Date: (props: StandardColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
+    DateTime: (props: StandardColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
+    Enum: (props: Omit<EnumColumnProps<TRow, PathOf<TRow>>, 'type'>) => React.ReactNode,
+    Number: (props: StandardColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
+    Text: (props: StandardColumnProps<TRow, PathOf<TRow>>) => React.ReactNode,
   },
   Table: React.ComponentType<Table<TRow>['props']>,
 }

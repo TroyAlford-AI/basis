@@ -227,12 +227,18 @@ export class TableDocs extends Documentation<Record<string, never>> {
           <h4>Column Props</h4>
           <ul>
             <li><code>align?: TextAlign</code> - Text alignment (Left, Right, Center)</li>
-            <li><code>enum?: Record&lt;string, string | number&gt;</code> - Enum options for Enum columns</li>
+            <li>
+              <code>enum: Record&lt;string, string | number&gt;</code> - Enum options; required when{' '}
+              <code>type</code> is <code>ColumnType.Enum</code> (not applicable to other column types)
+            </li>
             <li><code>field: PathOf&lt;T&gt;</code> - Path to the data field (supports dot notation)</li>
             <li><code>pin?: Pin</code> - Column pinning position (Left, Right, Unpinned)</li>
             <li><code>sortable?: boolean</code> - Whether the column is sortable (default: true)</li>
             <li><code>title?: string</code> - Column header text (defaults to field name)</li>
-            <li><code>type?: ColumnType</code> - Column type (Text, Number, Boolean, Date, DateTime, Enum)</li>
+            <li>
+              <code>type?: ColumnType</code> - Column type (Text, Number, Boolean, Date,
+              DateTime, Enum); <code>ColumnType.Enum</code> requires an <code>enum</code> definition
+            </li>
             <li><code>width?: string | number</code> - Column width</li>
           </ul>
         </Section>

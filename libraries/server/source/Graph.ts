@@ -1448,10 +1448,15 @@ export class Graph {
   }
 
   #entityRootExpression(action: Action): string | null {
+    const row = quoteIdentifier('Entity')
+    if (action === Action.Read) {
+      if (this.#entityReadFunction() === null) return null
+      return `${this.#qualified(this.#entityReadName())}(` +
+        `${row}.${quoteIdentifier('entity')}, ${row}.${quoteIdentifier('id')})`
+    }
     const leaves = this.definitions.concreteDescendants('Entity').map(entity => entity.name)
     const conditions: string[] = []
     for (const leaf of leaves) {
-      const row = quoteIdentifier('Entity')
       const alias = `__root_${conditions.length}`
       const expression = action === Action.Create
         ? this.#grantExpression(leaf, action, row, true, 'Entity')
@@ -1680,6 +1685,63 @@ export class Graph {
     return name.includes('.') ? name : `${this.#schema}.${name}`
   }
 
+  #entityReadName(): string {
+    return 'entity_readable'
+  }
+
+  /**
+   * Build the discriminator-dispatched root read policy.
+   *
+   * The function is procedural so PostgreSQL cannot inline the full set of
+   * concrete read policies into every physical join that reads an inherited
+   * root row. It evaluates only the branch selected by the actual discriminator.
+   * @returns The root read dispatcher, or null when no concrete leaf is readable.
+   */
+  #entityReadFunction(): PhysicalFunction | null {
+    const leaves = this.definitions.concreteDescendants('Entity').map(entity => entity.name)
+    const branches: string[] = []
+    for (const leaf of leaves) {
+      const expression = this.#leafExpression(leaf, Action.Read, '__row', false)
+      if (!expression) continue
+      branches.push(
+        `    WHEN ${literal(leaf)} THEN
+      RETURN EXISTS (
+        SELECT 1
+        FROM ${quoteIdentifier(leaf)} "__row"
+        WHERE "__row".${quoteIdentifier('id')} = root_id
+          AND ${expression}
+      );`,
+      )
+    }
+    if (branches.length === 0) return null
+    const name = this.#entityReadName()
+    const qualified = this.#qualified(name)
+    const signature = 'root_entity text, root_id text'
+    const body = `BEGIN
+  CASE root_entity
+${branches.join('\n')}
+    ELSE
+      RETURN FALSE;
+  END CASE;
+END;`
+    const generated = securityDefinerPlpgsqlFunction({
+      body,
+      qualified,
+      searchPath: this.#searchPath(),
+      signature,
+    })
+    return {
+      body: generated.body,
+      lifecycle: false,
+      name,
+      required: [name],
+      searchPath: this.#searchPath(),
+      securityDefiner: true,
+      signature,
+      sql: generated.sql,
+    }
+  }
+
   #policyFunctions(): PhysicalFunction[] {
     const functions: PhysicalFunction[] = []
     const seen = new Set<string>()
@@ -1730,6 +1792,8 @@ export class Graph {
         sql: generated.sql,
       })
     }
+    const rootRead = this.#entityReadFunction()
+    if (rootRead) functions.push(rootRead)
     return functions
   }
 
@@ -2264,6 +2328,37 @@ function securityDefinerFunction(options: {
       CREATE OR REPLACE FUNCTION ${options.qualified}(${options.signature})
       RETURNS boolean
       LANGUAGE sql STABLE SECURITY DEFINER SET search_path = ${options.searchPath} AS ${delimiter}
+        ${options.body}
+      ${delimiter};
+    `,
+  }
+}
+
+/**
+ * Build one SECURITY DEFINER PL/pgSQL function with a body-safe dollar delimiter.
+ *
+ * PL/pgSQL is intentional for the root-read dispatcher: it prevents the
+ * planner from inlining every concrete policy branch into every caller.
+ * @param options - Function name, signature, search path and body.
+ * @param options.body - Complete PL/pgSQL function body.
+ * @param options.qualified - Schema-qualified function name.
+ * @param options.searchPath - Function search path.
+ * @param options.signature - Function argument signature.
+ * @returns The function body and DDL.
+ */
+function securityDefinerPlpgsqlFunction(options: {
+  readonly body: string,
+  readonly qualified: string,
+  readonly searchPath: string,
+  readonly signature: string,
+}): { readonly body: string, readonly sql: string } {
+  const delimiter = dollarDelimiter(options.body)
+  return {
+    body: options.body,
+    sql: `
+      CREATE OR REPLACE FUNCTION ${options.qualified}(${options.signature})
+      RETURNS boolean
+      LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = ${options.searchPath} AS ${delimiter}
         ${options.body}
       ${delimiter};
     `,

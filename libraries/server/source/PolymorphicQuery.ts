@@ -1651,11 +1651,9 @@ class QueryProjection {
     const baseAlias = this.#nextAlias('b')
     const rootAlias = this.#nextAlias('r')
     this.joins.push(
-      `LEFT JOIN "${target.name}" "${baseAlias}" ON ` +
+      `LEFT JOIN ("${target.name}" "${baseAlias}" INNER JOIN "Entity" "${rootAlias}" ` +
+      `ON "${rootAlias}"."id" = "${baseAlias}"."id") ON ` +
       `"${baseAlias}".${quote(navigation.reference.column)} = "${source.context.baseAlias}"."id"`,
-    )
-    this.joins.push(
-      `LEFT JOIN "Entity" "${rootAlias}" ON "${rootAlias}"."id" = "${baseAlias}"."id"`,
     )
     const child = this.#node(targetContext(this.#entities, target, baseAlias, rootAlias), path)
     this.#identity(child)
@@ -1715,11 +1713,9 @@ class QueryProjection {
     const baseAlias = scope.alias('b')
     const rootAlias = scope.alias('r')
     scope.join(
-      `LEFT JOIN "${target.name}" "${baseAlias}" ON ` +
+      `LEFT JOIN ("${target.name}" "${baseAlias}" INNER JOIN "Entity" "${rootAlias}" ` +
+      `ON "${rootAlias}"."id" = "${baseAlias}"."id") ON ` +
       `"${baseAlias}"."id" = ${sourceAlias}.${quote(field.column)}`,
-    )
-    scope.join(
-      `LEFT JOIN "Entity" "${rootAlias}" ON "${rootAlias}"."id" = "${baseAlias}"."id"`,
     )
     return targetContext(this.#entities, target, baseAlias, rootAlias)
   }

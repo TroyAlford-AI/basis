@@ -69,7 +69,7 @@ describe('Graph', () => {
     const read = rootGraph.physicalSchema('basis_app', true).policies.find(policy => (
       policy.table === 'Entity' && policy.command === 'SELECT'
     ))
-    expect(read?.sql).toContain('public.policy_')
+    expect(read?.sql).toContain('public.entity_readable')
     expect(read?.sql).toContain('"Entity"."entity"')
     expect(() => new Graph({
       entities: [{ fields: [{ field: 'name', type: 'String' }], name: 'Note' }],
